@@ -19,8 +19,7 @@ app.use(cors());
 const generateID = () => Math.random().toString(36).substring(2, 10);
 let chatRooms = [];
 let tables = [];
-
-// let shoe = [];
+const cloneDeck = JSON.parse(JSON.stringify(deck))
 
 const startingHands = (table) => {
 	for (let i = 0; i < 2; i++) {
@@ -53,7 +52,9 @@ socketIO.on("connection", (socket) => {
 	});
 
 	socket.on("createTable", (name) => {
-		const startingDeck = shuffle(deck);
+		const cloneDeck = JSON.parse(JSON.stringify(deck))
+
+		const startingDeck = shuffle(cloneDeck);
 
 		socket.join(name);
 		tables.unshift({ id: generateID(), name, shoe: startingDeck, players: [], count: 0, countedCards: [] });
@@ -72,11 +73,11 @@ socketIO.on("connection", (socket) => {
 		let thisTable = tables.filter((table) => table.id == room_id);
 
 		if (thisTable[0].players.length === 0) { // not when joining
-			thisTable[0].players.push({ playerName: "dealer", hand: [], activePlayer: false })
+			thisTable[0].players.unshift({ playerName: "dealer", hand: [], activePlayer: false })
 		}
 
 		const activePlayer = !thisTable[0].players.find(player => player?.activePlayer)
-		thisTable[0].players.push({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000 })
+		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000 })
 
 		thisTable[0] = startingHands(thisTable[0]) // only runs for users without a hand
 
@@ -180,6 +181,15 @@ socketIO.on("connection", (socket) => {
 			player.hand = []
 		})
 
+		if (table[0].shoe.length < (table[0].players.length * 4)) {
+			console.log('new deck')
+			const cloneDeck = JSON.parse(JSON.stringify(deck))
+
+			const startingDeck = shuffle(cloneDeck);
+
+			table[0].shoe = shuffle(startingDeck)
+		}
+
 		const newTable = startingHands(table[0])
 
 		const { playerScore, count } = score(newTable.players[0].hand, newTable.countedCards)
@@ -187,8 +197,6 @@ socketIO.on("connection", (socket) => {
 		dealer[0].score = 0;
 		newTable.players[0].score = playerScore;
 		newTable.count = count;
-		console.log('table[0].players', JSON.stringify(newTable.players))
-		// socket.to(newTable.players).emit("gameReset", table[0].players);
 
 		socket.emit("gameReset", newTable)
 
