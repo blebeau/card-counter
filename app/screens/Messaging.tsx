@@ -12,13 +12,20 @@ import MessageComponent from "../components/MessageComponent";
 import { styles } from "../utils/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+type messages = {
+  id: string;
+  text: string;
+  user: string;
+  time: string;
+};
+
 // messages in chat
 const Messaging = ({ route, navigation }: any) => {
   const [user, setUser] = useState("");
   const { name, id } = route.params;
 
-  const [chatMessages, setChatMessages] = useState([]);
-  const [message, setMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState<messages[]>([]);
+  const [message, setMessage] = useState<string>("");
 
   const getUsername = async () => {
     try {
@@ -78,7 +85,7 @@ const Messaging = ({ route, navigation }: any) => {
             renderItem={({ item }) => (
               <MessageComponent item={item} user={user} />
             )}
-            keyExtractor={(item: any) => item.id}
+            keyExtractor={(item) => item.id}
           />
         ) : (
           ""

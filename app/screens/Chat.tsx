@@ -6,38 +6,25 @@ import ChatComponent from "../components/ChatComponent";
 import socket from "../utils/socket";
 import { styles } from "../utils/styles";
 import TableComponent from "../components/TableComponent";
+import { TableType } from "../types/types";
 
 // screen with chats
 const Chat = () => {
   const [visible, setVisible] = useState(false);
-  const [rooms, setRooms] = useState([]);
-  const [tables, setTables] = useState([]);
+  const [tables, setTables] = useState<TableType[]>([]);
 
   useLayoutEffect(() => {
-    function fetchGroups() {
-      fetch("http://10.0.2.2:4000/api/rooms")
-        .then((res) => res.json())
-        .then((data) => setTables(data))
-        .catch((err) => console.error(err));
-    }
     function fetchTables() {
       fetch("http://10.0.2.2:4000/api/tables")
         .then((res) => res.json())
         .then((data) => setTables(data))
         .catch((err) => console.error(err));
     }
-    fetchGroups();
     fetchTables();
   }, []);
 
   useEffect(() => {
-    socket.on("roomsList", (rooms: any) => {
-      setRooms(rooms);
-    });
-  }, [socket]);
-
-  useEffect(() => {
-    socket.on("tableList", (tables: any) => {
+    socket.on("tableList", (tables: TableType[]) => {
       setTables(tables);
     });
   }, [socket]);
@@ -55,21 +42,6 @@ const Chat = () => {
       </View>
 
       <View style={styles.chatlistContainer}>
-        {/* <View style={{ height: "50%" }}>
-          {rooms.length > 0 ? (
-            <FlatList
-              data={rooms}
-              renderItem={({ item }) => <ChatComponent item={item} />}
-              keyExtractor={(item: any) => item.id}
-            />
-          ) : (
-            <View style={styles.chatemptyContainer}>
-              <Text style={styles.chatemptyText}>No rooms created!</Text>
-              <Text>Click the icon above to create a Chat room</Text>
-            </View>
-          )}
-        </View> */}
-
         <View style={{ height: "50%" }}>
           <Text>Tables</Text>
           {tables.length > 0 ? (

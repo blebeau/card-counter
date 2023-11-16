@@ -11,15 +11,16 @@ import socket from "../utils/socket";
 import { styles } from "../utils/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { deckArray } from "../utils/deck";
+import { Card, Player, TableType } from "../types/types";
 
 // messages in chat
 const Table = ({ route, navigation }: any) => {
   const [user, setUser] = useState("");
   const { name, id } = route.params;
 
-  const [table, setTable] = useState<any>([]);
-  const [activePlayer, setActivePlayer] = useState<any>([]);
-  const [playing, setPlaying] = useState(false);
+  const [table, setTable] = useState<TableType>();
+  const [activePlayer, setActivePlayer] = useState<Player[]>([]);
+  const [playing, setPlaying] = useState<boolean>(false);
   const [count, setCount] = useState<number>(0);
   const [chips, setChips] = useState<number>(0);
   const [bet, setBet] = useState<number>(50);
@@ -37,6 +38,8 @@ const Table = ({ route, navigation }: any) => {
 
   const hit = () => {
     if (user) {
+      console.log("user", user);
+      console.log("activePlayer", JSON.stringify(activePlayer));
       socket.emit("hit", {
         room_id: id,
         user: activePlayer[0].playerName,
@@ -60,6 +63,20 @@ const Table = ({ route, navigation }: any) => {
         user,
       });
     }
+    console.log("active player", activePlayer);
+    socket.on("dealerPlay", (tableData: TableType, dealer: Player) => {
+      console.log("dealer.score", dealer.score);
+      const getActivePlayer = tableData.players.filter(
+        (p: Player) => p.activePlayer
+      );
+      console.log("getActivePlayer", getActivePlayer);
+      while (getActivePlayer[0].score < 17) {
+        console.log("if - hit", getActivePlayer);
+        hit();
+      }
+      console.log("else - reset");
+      reset();
+    });
   };
 
   const startGame = async () => {
@@ -69,9 +86,9 @@ const Table = ({ route, navigation }: any) => {
       user,
       table: table,
     });
-    socket.on("gameStarted", (tableData: any) => {
+    socket.on("gameStarted", (tableData: TableType) => {
       const getActivePlayer = tableData.players.filter(
-        (p: any) => p.activePlayer
+        (p: Player) => p.activePlayer
       );
       setActivePlayer(getActivePlayer);
 
@@ -81,39 +98,40 @@ const Table = ({ route, navigation }: any) => {
   };
 
   const reset = () => {
+    console.log("reset called");
     socket.emit("reset", {
       room_id: id,
       betValue: bet,
     });
-    socket.on("gameReset", (tableData: any) => {
+    socket.on("gameReset", (tableData: TableType) => {
       setTable(tableData);
       const player = tableData.players.filter(
-        (player: any) => player.playerName === user
+        (player: Player) => player.playerName === user
       );
       setChips(player[0].chips);
     });
   };
 
-  const dealerPlay = () => {
+  const dealerPlay = () =>
     setTimeout(() => {
       hit();
-    }, 1500);
-  };
+    }, 2500);
 
-  const setBetValue = ({ value }: any) => {
+  const setBetValue = (value: string) => {
     const intValue = parseInt(value);
 
     setBet(intValue);
   };
 
   useLayoutEffect(() => {
+    console.log("useLayoutEffect");
     navigation.setOptions({ title: name });
     getUsername();
     socket.emit("findTable", id);
-    socket.on("foundTable", (tableData: any) => {
+    socket.on("foundTable", (tableData: TableType) => {
       if (user) {
         const userData = tableData.players.filter(
-          (player: any) => player.playerName === user
+          (player: Player) => player.playerName === user
         );
 
         if (userData) {
@@ -126,17 +144,17 @@ const Table = ({ route, navigation }: any) => {
   }, []);
 
   useEffect(() => {
-    socket.on("foundTable", (tableData: any) => {
+    socket.on("foundTable", (tableData: TableType) => {
       if (user) {
         const userData = tableData.players.find(
-          (player: any) => player.playerName === user
+          (player: Player) => player.playerName === user
         );
-        if (userData.playerName === user) {
+        if (userData!.playerName === user) {
           setPlaying(true);
         }
       }
       setTable(tableData);
-      setActivePlayer(tableData.players.filter((p: any) => p.activePlayer));
+      setActivePlayer(tableData.players.filter((p: Player) => p.activePlayer));
     });
   }, [socket]);
   return (
@@ -172,9 +190,9 @@ const Table = ({ route, navigation }: any) => {
         </View>
 
         <View style={inlineStyles.table}>
-          {table.players &&
-            table.players.length > 0 &&
-            table.players.map((player: any, index: number) => {
+          {table!.players &&
+            table!.players.length > 0 &&
+            table!.players.map((player: Player, index: number) => {
               return (
                 <View
                   style={
@@ -187,7 +205,7 @@ const Table = ({ route, navigation }: any) => {
                   <Text>{player.score}</Text>
                   <Text>{player.playerName}</Text>
                   <View style={inlineStyles.player}>
-                    {player.hand.map((card: any, index: number) => {
+                    {player.hand.map((card: Card, index: number) => {
                       const cardFinder = deckArray.find(
                         (x) => x.card === card.card
                       );

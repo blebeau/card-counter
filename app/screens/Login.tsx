@@ -10,7 +10,7 @@ import {
 import { styles } from "../utils/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState("");
 
   const storeUsername = async () => {

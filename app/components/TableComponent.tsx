@@ -6,11 +6,6 @@ import { styles } from "../utils/styles";
 
 const TableComponent = ({ item }: any) => {
   const navigation = useNavigation<any>();
-  //   const [messages, setMessages] = useState<any>({});
-
-  //   useLayoutEffect(() => {
-  //     setMessages(item.messages[item.messages.length - 1]);
-  //   }, []);
 
   const handleNavigation = () => {
     navigation.navigate("Table", {

@@ -109,6 +109,7 @@ socketIO.on("connection", (socket) => {
 
 	socket.on("hit", (data) => {
 		const { room_id, user } = data;
+		console.log('user hit', user)
 
 		let result = tables.filter((room) => room.id == room_id);
 
@@ -139,7 +140,9 @@ socketIO.on("connection", (socket) => {
 
 		result[0].players.filter((p) => p.playerName == user)[0].activePlayer = false
 
-		if (result[0].players.find(player => player.playerName === "dealer" && player.activePlayer)) {
+		const activePlayer = result[0].players.find(player => player.activePlayer)
+
+		if (activePlayer.playerName === "dealer") {
 			const dealer = result[0].players.filter(player => player.playerName === "dealer")
 
 			result[0].countedCards = result[0].countedCards.concat(dealer[0].hand[1])
@@ -154,9 +157,20 @@ socketIO.on("connection", (socket) => {
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", result[0]);
+
+		if (activePlayer.playerName === "dealer") {
+			console.log('dealer is active', activePlayer.playerName)
+
+
+			socket.emit("dealerPlay", result[0], activePlayer);
+		}
 	});
 
-	socket.on("reset", (data) => { // Similar to what dealing will be
+	// socket.on("dealerPlay", (data) => {
+
+	// })
+
+	socket.on("reset", (data) => {
 		const { room_id, betValue } = data;
 
 		let table = tables.filter((room) => room.id == room_id);
@@ -203,6 +217,8 @@ socketIO.on("connection", (socket) => {
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", newTable);
 	});
+
+
 
 	socket.on("disconnect", () => {
 		socket.disconnect();
