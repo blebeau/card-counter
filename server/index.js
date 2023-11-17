@@ -109,7 +109,6 @@ socketIO.on("connection", (socket) => {
 
 	socket.on("hit", (data) => {
 		const { room_id, user } = data;
-		console.log('user hit', user)
 
 		let result = tables.filter((room) => room.id == room_id);
 
@@ -159,16 +158,10 @@ socketIO.on("connection", (socket) => {
 		socket.emit("foundTable", result[0]);
 
 		if (activePlayer.playerName === "dealer") {
-			console.log('dealer is active', activePlayer.playerName)
-
 
 			socket.emit("dealerPlay", result[0], activePlayer);
 		}
 	});
-
-	// socket.on("dealerPlay", (data) => {
-
-	// })
 
 	socket.on("reset", (data) => {
 		const { room_id, betValue } = data;
@@ -196,7 +189,6 @@ socketIO.on("connection", (socket) => {
 		})
 
 		if (table[0].shoe.length < (table[0].players.length * 4)) {
-			console.log('new deck')
 			const cloneDeck = JSON.parse(JSON.stringify(deck))
 
 			const startingDeck = shuffle(cloneDeck);

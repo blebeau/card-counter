@@ -48,7 +48,7 @@ const Chat = () => {
             <FlatList
               data={tables}
               renderItem={({ item }) => <TableComponent item={item} />}
-              keyExtractor={(item: any) => item.id}
+              keyExtractor={(item: TableType) => item.id}
             />
           ) : (
             <View style={styles.chatemptyContainer}>

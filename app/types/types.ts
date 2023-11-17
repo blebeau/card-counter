@@ -1,6 +1,6 @@
 export type Card = {
   card: string;
-  cardLink: any;
+  cardLink: string;
 };
 
 export type Player = {
@@ -19,4 +19,17 @@ export type TableType = {
   startingDeck: Card[];
   count: number;
   countedCards: Card[];
+};
+
+export type Message = {
+  id: string;
+  text: string;
+  user: string;
+  time: string;
+};
+
+export type Rooms = {
+  id: string;
+  name: string;
+  messages: Message[];
 };

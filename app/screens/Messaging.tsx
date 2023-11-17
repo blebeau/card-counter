@@ -11,6 +11,7 @@ import socket from "../utils/socket";
 import MessageComponent from "../components/MessageComponent";
 import { styles } from "../utils/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Message } from "../types/types";
 
 type messages = {
   id: string;
@@ -63,11 +64,15 @@ const Messaging = ({ route, navigation }: any) => {
     navigation.setOptions({ title: name });
     getUsername();
     socket.emit("findRoom", id);
-    socket.on("foundRoom", (roomChats: any) => setChatMessages(roomChats));
+    socket.on("foundRoom", (roomChats: Message[]) =>
+      setChatMessages(roomChats)
+    );
   }, []);
 
   useEffect(() => {
-    socket.on("foundRoom", (roomChats: any) => setChatMessages(roomChats));
+    socket.on("foundRoom", (roomChats: Message[]) =>
+      setChatMessages(roomChats)
+    );
   }, [socket]);
 
   return (
@@ -85,7 +90,7 @@ const Messaging = ({ route, navigation }: any) => {
             renderItem={({ item }) => (
               <MessageComponent item={item} user={user} />
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item: Message) => item.id}
           />
         ) : (
           ""

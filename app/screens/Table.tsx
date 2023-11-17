@@ -38,8 +38,6 @@ const Table = ({ route, navigation }: any) => {
 
   const hit = () => {
     if (user) {
-      console.log("user", user);
-      console.log("activePlayer", JSON.stringify(activePlayer));
       socket.emit("hit", {
         room_id: id,
         user: activePlayer[0].playerName,
@@ -63,18 +61,13 @@ const Table = ({ route, navigation }: any) => {
         user,
       });
     }
-    console.log("active player", activePlayer);
-    socket.on("dealerPlay", (tableData: TableType, dealer: Player) => {
-      console.log("dealer.score", dealer.score);
+    socket.on("dealerPlay", (tableData: TableType) => {
       const getActivePlayer = tableData.players.filter(
         (p: Player) => p.activePlayer
       );
-      console.log("getActivePlayer", getActivePlayer);
       while (getActivePlayer[0].score < 17) {
-        console.log("if - hit", getActivePlayer);
         hit();
       }
-      console.log("else - reset");
       reset();
     });
   };
@@ -98,7 +91,6 @@ const Table = ({ route, navigation }: any) => {
   };
 
   const reset = () => {
-    console.log("reset called");
     socket.emit("reset", {
       room_id: id,
       betValue: bet,
@@ -124,7 +116,6 @@ const Table = ({ route, navigation }: any) => {
   };
 
   useLayoutEffect(() => {
-    console.log("useLayoutEffect");
     navigation.setOptions({ title: name });
     getUsername();
     socket.emit("findTable", id);
@@ -190,9 +181,9 @@ const Table = ({ route, navigation }: any) => {
         </View>
 
         <View style={inlineStyles.table}>
-          {table!.players &&
-            table!.players.length > 0 &&
-            table!.players.map((player: Player, index: number) => {
+          {table?.players &&
+            table?.players.length > 0 &&
+            table?.players.map((player: Player, index: number) => {
               return (
                 <View
                   style={
