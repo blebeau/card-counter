@@ -2,14 +2,13 @@ import React, { useState, useLayoutEffect, useEffect } from "react";
 import { View, Text, Pressable, SafeAreaView, FlatList } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Modal from "../components/Modal";
-import ChatComponent from "../components/ChatComponent";
 import socket from "../utils/socket";
 import { styles } from "../utils/styles";
 import TableComponent from "../components/TableComponent";
 import { TableType } from "../types/types";
 
 // screen with chats
-const Chat = () => {
+const Tables = () => {
   const [visible, setVisible] = useState(false);
   const [tables, setTables] = useState<TableType[]>([]);
 
@@ -34,7 +33,7 @@ const Chat = () => {
     <SafeAreaView style={styles.chatscreen}>
       <View style={styles.chattopContainer}>
         <View style={styles.chatheader}>
-          <Text style={styles.chatheading}>Chats</Text>
+          <Text style={styles.chatheading}>Tables</Text>
           <Pressable onPress={handleCreateGroup}>
             <Feather name="edit" size={24} color="green" />
           </Pressable>
@@ -43,7 +42,6 @@ const Chat = () => {
 
       <View style={styles.chatlistContainer}>
         <View style={{ height: "50%" }}>
-          <Text>Tables</Text>
           {tables.length > 0 ? (
             <FlatList
               data={tables}
@@ -63,4 +61,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+export default Tables;

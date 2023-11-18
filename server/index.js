@@ -124,7 +124,7 @@ socketIO.on("connection", (socket) => {
 		player[0].score = playerScore;
 		result[0].count = count;
 
-		socket.to(result[0].players).emit("playerHit", result[0].players);
+		socket.emit("playerHit", result[0].players);
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", result[0]);

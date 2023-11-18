@@ -13,7 +13,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { deckArray } from "../utils/deck";
 import { Card, Player, TableType } from "../types/types";
 
-// messages in chat
 const Table = ({ route, navigation }: any) => {
   const [user, setUser] = useState("");
   const { name, id } = route.params;
@@ -25,11 +24,20 @@ const Table = ({ route, navigation }: any) => {
   const [chips, setChips] = useState<number>(0);
   const [bet, setBet] = useState<number>(50);
 
+  const getDealerScore = async (tableData: TableType) => {
+    const getDealer = tableData.players.filter(
+      (p: Player) => p.playerName === "dealer"
+    );
+    console.log("dealer", getDealer);
+    console.log("dealer", getDealer[0].score);
+    return getDealer[0].score;
+  };
+
   const getUsername = async () => {
     try {
       const value = await AsyncStorage.getItem("username");
       if (value !== null) {
-        setUser(value);
+        await setUser(value);
       }
     } catch (e) {
       console.error("Error while loading username!");
@@ -41,6 +49,19 @@ const Table = ({ route, navigation }: any) => {
       socket.emit("hit", {
         room_id: id,
         user: activePlayer[0].playerName,
+      });
+
+      socket.on("playerHit", (playerData: Player) => {
+        console.log("player data", playerData);
+      });
+    }
+  };
+
+  const dealerHit = () => {
+    if (user) {
+      socket.emit("hit", {
+        room_id: id,
+        user: "dealer",
       });
     }
   };
@@ -55,30 +76,41 @@ const Table = ({ route, navigation }: any) => {
   };
 
   const stay = () => {
+    console.log("stay");
     if (user) {
       socket.emit("stay", {
         room_id: id,
         user,
       });
     }
+    console.log("stay");
+    let escape = 0;
     socket.on("dealerPlay", (tableData: TableType) => {
-      const getActivePlayer = tableData.players.filter(
-        (p: Player) => p.activePlayer
-      );
-      while (getActivePlayer[0].score < 17) {
-        hit();
+      const score = getDealerScore(tableData);
+      console.log("score", score);
+
+      while (escape < 2) {
+        console.log("score in loop", score);
+        escape += 1;
+        dealerHit();
       }
-      reset();
+      // reset();
     });
   };
 
   const startGame = async () => {
     setPlaying(true);
-    socket.emit("startGame", {
-      room_id: id,
-      user,
-      table: table,
-    });
+    const userData = table?.players.find(
+      (player: Player) => player.playerName === user
+    );
+    if (userData) {
+      setPlaying(true);
+    } else
+      socket.emit("startGame", {
+        room_id: id,
+        user,
+        table: table,
+      });
     socket.on("gameStarted", (tableData: TableType) => {
       const getActivePlayer = tableData.players.filter(
         (p: Player) => p.activePlayer
@@ -116,6 +148,8 @@ const Table = ({ route, navigation }: any) => {
   };
 
   useLayoutEffect(() => {
+    console.log("useLayoutEffect");
+
     navigation.setOptions({ title: name });
     getUsername();
     socket.emit("findTable", id);
@@ -135,15 +169,9 @@ const Table = ({ route, navigation }: any) => {
   }, []);
 
   useEffect(() => {
+    console.log("use effect");
+    getUsername();
     socket.on("foundTable", (tableData: TableType) => {
-      if (user) {
-        const userData = tableData.players.find(
-          (player: Player) => player.playerName === user
-        );
-        if (userData!.playerName === user) {
-          setPlaying(true);
-        }
-      }
       setTable(tableData);
       setActivePlayer(tableData.players.filter((p: Player) => p.activePlayer));
     });

@@ -1,7 +1,7 @@
 import React from "react";
 import Login from "./screens/Login";
 import Table from "./screens/Table";
-import Chat from "./screens/Chat";
+import Chat from "./screens/Tables";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -21,7 +21,7 @@ export default function App() {
           name="Chat"
           component={Chat}
           options={{
-            title: "Chats",
+            title: "Tables",
             headerShown: false,
           }}
         />
