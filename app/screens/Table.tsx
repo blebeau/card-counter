@@ -23,6 +23,7 @@ const Table = ({ route, navigation }: any) => {
   const [count, setCount] = useState<number>(0);
   const [chips, setChips] = useState<number>(0);
   const [bet, setBet] = useState<number>(50);
+  const [activeScore, setActiveScore] = useState<number>(0);
 
   const getDealerScore = async (tableData: TableType) => {
     const getDealer = tableData.players.filter(
@@ -51,20 +52,21 @@ const Table = ({ route, navigation }: any) => {
         user: activePlayer[0].playerName,
       });
 
-      socket.on("playerHit", (playerData: Player) => {
-        console.log("player data", playerData);
-      });
+      // socket.on("playerHit", (playerData: Player[]) => {
+      //   console.log("player data", playerData);
+      //   setActiveScore(playerData[0].score);
+      // });
     }
   };
 
-  const dealerHit = () => {
-    if (user) {
-      socket.emit("hit", {
-        room_id: id,
-        user: "dealer",
-      });
-    }
-  };
+  // const dealerHit = () => {
+  //   if (user) {
+  //     socket.emit("hit", {
+  //       room_id: id,
+  //       user: "dealer",
+  //     });
+  //   }
+  // };
 
   const doubleDown = () => {
     if (user) {
@@ -84,17 +86,11 @@ const Table = ({ route, navigation }: any) => {
       });
     }
     console.log("stay");
-    let escape = 0;
     socket.on("dealerPlay", (tableData: TableType) => {
-      const score = getDealerScore(tableData);
-      console.log("score", score);
-
-      while (escape < 2) {
-        console.log("score in loop", score);
-        escape += 1;
-        dealerHit();
-      }
-      // reset();
+      socket.emit("dealerHit", {
+        room_id: id,
+        user: "dealer",
+      });
     });
   };
 
@@ -136,10 +132,19 @@ const Table = ({ route, navigation }: any) => {
     });
   };
 
-  const dealerPlay = () =>
-    setTimeout(() => {
-      hit();
-    }, 2500);
+  // const dealerPlay = async (tableData: any) => {
+  //   let escape = 0;
+  //   const score = getDealerScore(tableData);
+  //   console.log("score", score);
+
+  //   while (escape < 2) {
+  //     console.log("score in loop", score);
+  //     console.log("activeScore loop", activeScore);
+  //     escape += 1;
+  //     dealerHit();
+  //   }
+  //   // reset();
+  // };
 
   const setBetValue = (value: string) => {
     const intValue = parseInt(value);
