@@ -37,7 +37,6 @@ const startingHands = (table) => {
 
 socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
-	console.log("socket tables", tables);
 
 	socket.on("createRoom", (name) => {
 		socket.join(name);
@@ -109,7 +108,6 @@ socketIO.on("connection", (socket) => {
 
 	socket.on("hit", (data) => {
 		const { room_id, user } = data;
-		console.log('hit start')
 		let result = tables.filter((room) => room.id == room_id);
 
 		let player = result[0].players.filter((p) => p.playerName == user)
@@ -123,63 +121,29 @@ socketIO.on("connection", (socket) => {
 
 		player[0].score = playerScore;
 		result[0].count = count;
-		console.log('dealer turn playerScore', playerScore)
-		if (user === "dealer" && playerScore < 17) {
-			console.log('dealer turn')
-			let dealerScore = playerScore
-
-			console.log('dealerScore', dealerScore)
-			while (dealerScore < 17) {
-				console.log('while dealerScore', dealerScore)
-				const card = result[0].shoe.splice(0, 1)
-
-				console.log('card', card)
-
-				player[0].hand = player[0].hand.concat(card)
-				result[0].countedCards = result[0].countedCards.concat(card)
-
-				console.log('player[0].hand', player[0].hand)
-
-				const { playerScore, count } = score(player[0].hand, result[0].countedCards)
-				dealerScore = playerScore
-
-				player[0].score = playerScore;
-				result[0].count = count;
-			}
-		}
-
-		// socket.emit("playerHit", result[0].players);
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", result[0]);
 	});
 
 	socket.on("dealerHit", (data) => {
-		const { room_id, user } = data;
-		console.log('hit start')
+		const { room_id } = data;
 		let result = tables.filter((room) => room.id == room_id);
 
-		let player = result[0].players.filter((p) => p.playerName == user)
+		let player = result[0].players.filter((p) => p.playerName === "dealer")
 
 		const { playerScore, count } = score(player[0].hand, result[0].countedCards)
 
 		player[0].score = playerScore;
 		result[0].count = count;
 
-		console.log('dealer turn')
 		let dealerScore = playerScore
 
-		console.log('dealerScore', dealerScore)
 		while (dealerScore < 17) {
-			console.log('while dealerScore', dealerScore)
 			const card = result[0].shoe.splice(0, 1)
-
-			console.log('card', card)
 
 			player[0].hand = player[0].hand.concat(card)
 			result[0].countedCards = result[0].countedCards.concat(card)
-
-			console.log('player[0].hand', player[0].hand)
 
 			const { playerScore, count } = score(player[0].hand, result[0].countedCards)
 			dealerScore = playerScore
@@ -194,7 +158,6 @@ socketIO.on("connection", (socket) => {
 
 	socket.on("stay", (data) => {
 		const { room_id, user } = data;
-		console.log("stay start");
 		let result = tables.filter((room) => room.id == room_id);
 
 		result[0].players.filter((p) => !p.activePlayer)[0].activePlayer = true
@@ -220,7 +183,6 @@ socketIO.on("connection", (socket) => {
 		socket.emit("foundTable", result[0]);
 
 		if (activePlayer.playerName === "dealer") {
-			console.log('dealer play')
 			socket.emit("dealerPlay", result[0], activePlayer);
 		}
 	});

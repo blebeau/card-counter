@@ -23,16 +23,6 @@ const Table = ({ route, navigation }: any) => {
   const [count, setCount] = useState<number>(0);
   const [chips, setChips] = useState<number>(0);
   const [bet, setBet] = useState<number>(50);
-  const [activeScore, setActiveScore] = useState<number>(0);
-
-  const getDealerScore = async (tableData: TableType) => {
-    const getDealer = tableData.players.filter(
-      (p: Player) => p.playerName === "dealer"
-    );
-    console.log("dealer", getDealer);
-    console.log("dealer", getDealer[0].score);
-    return getDealer[0].score;
-  };
 
   const getUsername = async () => {
     try {
@@ -51,22 +41,8 @@ const Table = ({ route, navigation }: any) => {
         room_id: id,
         user: activePlayer[0].playerName,
       });
-
-      // socket.on("playerHit", (playerData: Player[]) => {
-      //   console.log("player data", playerData);
-      //   setActiveScore(playerData[0].score);
-      // });
     }
   };
-
-  // const dealerHit = () => {
-  //   if (user) {
-  //     socket.emit("hit", {
-  //       room_id: id,
-  //       user: "dealer",
-  //     });
-  //   }
-  // };
 
   const doubleDown = () => {
     if (user) {
@@ -78,18 +54,15 @@ const Table = ({ route, navigation }: any) => {
   };
 
   const stay = () => {
-    console.log("stay");
     if (user) {
       socket.emit("stay", {
         room_id: id,
         user,
       });
     }
-    console.log("stay");
-    socket.on("dealerPlay", (tableData: TableType) => {
+    socket.on("dealerPlay", () => {
       socket.emit("dealerHit", {
         room_id: id,
-        user: "dealer",
       });
     });
   };
@@ -132,20 +105,6 @@ const Table = ({ route, navigation }: any) => {
     });
   };
 
-  // const dealerPlay = async (tableData: any) => {
-  //   let escape = 0;
-  //   const score = getDealerScore(tableData);
-  //   console.log("score", score);
-
-  //   while (escape < 2) {
-  //     console.log("score in loop", score);
-  //     console.log("activeScore loop", activeScore);
-  //     escape += 1;
-  //     dealerHit();
-  //   }
-  //   // reset();
-  // };
-
   const setBetValue = (value: string) => {
     const intValue = parseInt(value);
 
@@ -153,8 +112,6 @@ const Table = ({ route, navigation }: any) => {
   };
 
   useLayoutEffect(() => {
-    console.log("useLayoutEffect");
-
     navigation.setOptions({ title: name });
     getUsername();
     socket.emit("findTable", id);
@@ -174,7 +131,6 @@ const Table = ({ route, navigation }: any) => {
   }, []);
 
   useEffect(() => {
-    console.log("use effect");
     getUsername();
     socket.on("foundTable", (tableData: TableType) => {
       setTable(tableData);
