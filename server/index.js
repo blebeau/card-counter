@@ -154,6 +154,7 @@ socketIO.on("connection", (socket) => {
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", result[0]);
+		socket.emit("roundEnded", result[0])
 	});
 
 	socket.on("stay", (data) => {

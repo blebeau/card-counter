@@ -65,6 +65,11 @@ const Table = ({ route, navigation }: any) => {
         room_id: id,
       });
     });
+    socket.on("roundEnded", (tableData: TableType) => {
+      // TODO: Add a pop up for user to see win/ loss.
+      // Updating the score function (or new end game scoring?)
+      reset();
+    });
   };
 
   const startGame = async () => {
