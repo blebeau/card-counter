@@ -11,6 +11,7 @@ const socketIO = require("socket.io")(http, {
 const shuffle = require("./utils/shuffle");
 const deck = require("./utils/deck");
 const score = require("./utils/score");
+const startingHands = require("./utils/startingHand");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -20,20 +21,6 @@ const generateID = () => Math.random().toString(36).substring(2, 10);
 let chatRooms = [];
 let tables = [];
 const cloneDeck = JSON.parse(JSON.stringify(deck))
-
-const startingHands = (table) => {
-	for (let i = 0; i < 2; i++) {
-		table.players.forEach(player => {
-			const card = table.shoe.splice(0, 1)
-
-			player.hand = player.hand.concat(card);
-			if (player.playerName === "dealer" && player.hand.length === 1) {
-				return
-			} else table.countedCards = table.countedCards.concat(card);
-		});
-	}
-	return table;
-}
 
 socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
@@ -253,3 +240,5 @@ app.get("/api/tables", (req, res) => {
 http.listen(PORT, () => {
 	console.log(`Server listening on ${PORT}`);
 });
+
+module.exports = { startingHands }
