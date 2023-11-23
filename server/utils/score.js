@@ -1,17 +1,12 @@
-module.exports = playerScore = (
-	cards,
-	playedCards,
-	// currentCount
-) => {
-	let playerScore = 0;
+const tenValueCards = [
+	"c10", "jc", "qc", "kc",
+	"d10", "jd", "qd", "kd",
+	"s10", "js", "qs", "ks",
+	"h10", "jh", "qh", "kh",
+];
+
+exports.getCount = (playedCards) => {
 	let count = 0;
-	let aceCount = 0;
-	const tenValueCards = [
-		"c10", "jc", "qc", "kc",
-		"d10", "jd", "qd", "kd",
-		"s10", "js", "qs", "ks",
-		"h10", "jh", "qh", "kh",
-	];
 
 	const cardValue = (card) => {
 		const cardDenomination = card.match(/\d+/)
@@ -32,6 +27,18 @@ module.exports = playerScore = (
 
 		}
 	});
+	return count;
+};
+
+exports.score = (cards) => {
+	let aceCount = 0;
+	let playerScore = 0;
+	const cardValue = (card) => {
+		const cardDenomination = card.match(/\d+/)
+		if (!cardDenomination) return
+		return cardDenomination[0]
+	}
+
 	cards.forEach((card) => {
 		// gets number from the card string as a string
 		const cardScore = cardValue(card.card)
@@ -59,5 +66,26 @@ module.exports = playerScore = (
 		}
 	}
 
-	return { playerScore, count };
-};
+	return playerScore;
+}
+
+exports.payout = (table) => {
+	const dealer = table[0].players.filter(player => player.playerName === "dealer")
+	const dealerScore = dealer[0].score
+	table[0].players.forEach(player => {
+		if (player.playerName !== 'dealer') {
+			if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
+				player.chips -= player.betValue
+			}
+			if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
+				player.chips += player.betValue
+			}
+			if (player.score === 21 && player.hand.length === 2) {
+				player.chips += (player.betValue * 1.5)
+			}
+		}
+		player.hand = []
+	})
+
+	return table[0]
+}

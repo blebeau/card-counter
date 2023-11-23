@@ -26,7 +26,6 @@ const testingTable = [{
 
 test('Starting Hands', async () => {
 	const table = await startingHands(testingTable[0])
-	console.log('table', table)
 	testingTable[0].players.forEach(player => {
 		expect(player.hand.length).toBe(2)
 	});
