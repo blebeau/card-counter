@@ -60,16 +60,18 @@ const Table = ({ route, navigation }: any) => {
         user,
       });
     }
-    socket.on("dealerPlay", () => {
-      socket.emit("dealerHit", {
-        room_id: id,
-      });
-    });
-    socket.on("roundEnded", (tableData: TableType) => {
-      // TODO: Add a pop up for user to see win/ loss.
-      // Updating the score function (or new end game scoring?)
-      reset();
-    });
+    // socket.on("dealerPlay", () => {
+    //   console.log("dealerPlay - dealer hit");
+    //   socket.emit("dealerHit", {
+    //     room_id: id,
+    //   });
+    // });
+    // socket.on("roundEnded", () => {
+    //   console.log("roundEnded");
+    //   // TODO: Add a pop up for user to see win/ loss.
+    //   // Updating the score function (or new end game scoring?)
+    //   // reset();
+    // });
   };
 
   const startGame = async () => {

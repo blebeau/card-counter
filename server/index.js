@@ -15,6 +15,7 @@ const startingHands = require("./utils/startingHand");
 const finder = require("./utils/helpers");
 
 const { getCount, score, payout } = require('./utils/score');
+const e = require("express");
 
 
 app.use(express.urlencoded({ extended: true }));
@@ -118,44 +119,49 @@ socketIO.on("connection", (socket) => {
 		socket.emit("foundTable", table[0]);
 	});
 
-	socket.on("dealerHit", (data) => {
-		const { room_id } = data;
-		let table = finder(tables, room_id)
+	// socket.on("dealerHit", (data) => {
+	// 	console.log("dealerHit")
+	// 	const { room_id } = data;
+	// 	let table = finder(tables, room_id)
 
-		let player = table[0].players.filter((p) => p.playerName === "dealer")
+	// 	let player = table[0].players.filter((p) => p.playerName === "dealer")
 
-		const playerScore = score(player[0].hand)
-		const count = getCount(table[0].countedCards)
+	// 	const playerScore = score(player[0].hand)
+	// 	const count = getCount(table[0].countedCards)
 
-		player[0].score = playerScore;
-		table[0].count = count;
+	// 	player[0].score = playerScore;
+	// 	table[0].count = count;
 
-		let dealerScore = playerScore
+	// 	let dealerScore = playerScore
 
-		while (dealerScore < 17) {
-			const card = table[0].shoe.splice(0, 1)
+	// 	while (dealerScore < 17) {
+	// 		console.log("while loop")
 
-			player[0].hand = player[0].hand.concat(card)
-			table[0].countedCards = table[0].countedCards.concat(card)
+	// 		const card = table[0].shoe.splice(0, 1)
 
-			const playerScore = score(player[0].hand)
-			const count = getCount(table[0].countedCards)
+	// 		player[0].hand = player[0].hand.concat(card)
+	// 		table[0].countedCards = table[0].countedCards.concat(card)
 
-			dealerScore = playerScore
+	// 		const playerScore = score(player[0].hand)
+	// 		const count = getCount(table[0].countedCards)
 
-			player[0].score = playerScore;
-			table[0].count = count;
-		}
+	// 		dealerScore = playerScore
 
-		socket.emit("tableList", tables);
-		socket.emit("foundTable", table[0]);
-		socket.emit("roundEnded", table[0])
-	});
+	// 		player[0].score = playerScore;
+	// 		table[0].count = count;
+	// 	}
+	// 	console.log("round end - dealerHit")
+	// 	socket.emit("roundEnded")
+	// 	socket.emit("tableList", tables);
+	// 	socket.emit("foundTable", table[0]);
+
+	// });
 
 	socket.on("stay", (data) => {
+		console.log('stay')
 		const { room_id, user } = data;
 		let table = finder(tables, room_id)
-
+		console.log("here 1")
 		table[0].players.filter((p) => !p.activePlayer)[0].activePlayer = true
 
 		table[0].players.filter((p) => p.playerName == user)[0].activePlayer = false
@@ -163,6 +169,7 @@ socketIO.on("connection", (socket) => {
 		const activePlayer = table[0].players.find(player => player.activePlayer)
 
 		if (activePlayer.playerName === "dealer") {
+			console.log("here 2")
 			const dealer = table[0].players.filter(player => player.playerName === "dealer")
 
 			table[0].countedCards = table[0].countedCards.concat(dealer[0].hand[1])
@@ -180,12 +187,45 @@ socketIO.on("connection", (socket) => {
 		socket.emit("foundTable", table[0]);
 
 		if (activePlayer.playerName === "dealer") {
-			socket.emit("dealerPlay", table[0], activePlayer);
+			console.log("dealerHit")
+			const { room_id } = data;
+			let table = finder(tables, room_id)
+
+			let player = table[0].players.filter((p) => p.playerName === "dealer")
+
+			const playerScore = score(player[0].hand)
+			const count = getCount(table[0].countedCards)
+
+			player[0].score = playerScore;
+			table[0].count = count;
+
+			let dealerScore = playerScore
+
+			while (dealerScore < 17) {
+				console.log("while loop")
+
+				const card = table[0].shoe.splice(0, 1)
+
+				player[0].hand = player[0].hand.concat(card)
+				table[0].countedCards = table[0].countedCards.concat(card)
+
+				const playerScore = score(player[0].hand)
+				const count = getCount(table[0].countedCards)
+
+				dealerScore = playerScore
+
+				player[0].score = playerScore;
+				table[0].count = count;
+			}
+			console.log("round end - dealerHit")
+			// socket.emit("roundEnded")
+			socket.emit("tableList", tables);
+			socket.emit("foundTable", table[0]);
 		}
 	});
 
 	socket.on("reset", (data) => {
-		const { room_id, betValue } = data;
+		const { room_id } = data;
 
 		let table = finder(tables, room_id)
 
@@ -193,21 +233,6 @@ socketIO.on("connection", (socket) => {
 		table[0].players[0].activePlayer = true
 
 		table[0] = payout(table)
-
-		// table[0].players.forEach(player => {
-		// 	if (player.playerName !== 'dealer') {
-		// 		if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
-		// 			player.chips -= betValue
-		// 		}
-		// 		if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
-		// 			player.chips += betValue
-		// 		}
-		// 		if (player.score === 21 && player.hand.length === 2) {
-		// 			player.chips += (betValue * 1.5)
-		// 		}
-		// 	}
-		// 	player.hand = []
-		// })
 
 		if (table[0].shoe.length < (table[0].players.length * 4)) {
 			const cloneDeck = JSON.parse(JSON.stringify(deck))
@@ -219,11 +244,16 @@ socketIO.on("connection", (socket) => {
 
 		const newTable = startingHands(table[0])
 
+		console.log("newTable", JSON.stringify(newTable))
+
 		newTable.players.forEach(player => {
+			console.log("player", player)
 			if (player.playerName === "dealer") {
 				player.score = 0;
+			} else {
+				player.score = score(player.hand)
 			}
-			player.score = score(player.hand)
+
 		});
 
 		const count = getCount(table[0].countedCards)
