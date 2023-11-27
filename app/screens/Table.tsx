@@ -28,7 +28,7 @@ const Table = ({ route, navigation }: any) => {
     try {
       const value = await AsyncStorage.getItem("username");
       if (value !== null) {
-        await setUser(value);
+        setUser(value);
       }
     } catch (e) {
       console.error("Error while loading username!");
@@ -60,18 +60,6 @@ const Table = ({ route, navigation }: any) => {
         user,
       });
     }
-    // socket.on("dealerPlay", () => {
-    //   console.log("dealerPlay - dealer hit");
-    //   socket.emit("dealerHit", {
-    //     room_id: id,
-    //   });
-    // });
-    // socket.on("roundEnded", () => {
-    //   console.log("roundEnded");
-    //   // TODO: Add a pop up for user to see win/ loss.
-    //   // Updating the score function (or new end game scoring?)
-    //   // reset();
-    // });
   };
 
   const startGame = async () => {
@@ -92,7 +80,6 @@ const Table = ({ route, navigation }: any) => {
         (p: Player) => p.activePlayer
       );
       setActivePlayer(getActivePlayer);
-
       setChips(getActivePlayer[0].chips);
       setTable(tableData);
     });
@@ -102,13 +89,6 @@ const Table = ({ route, navigation }: any) => {
     socket.emit("reset", {
       room_id: id,
       betValue: bet,
-    });
-    socket.on("gameReset", (tableData: TableType) => {
-      setTable(tableData);
-      const player = tableData.players.filter(
-        (player: Player) => player.playerName === user
-      );
-      setChips(player[0].chips);
     });
   };
 
@@ -123,14 +103,12 @@ const Table = ({ route, navigation }: any) => {
     getUsername();
     socket.emit("findTable", id);
     socket.on("foundTable", (tableData: TableType) => {
-      if (user) {
-        const userData = tableData.players.filter(
-          (player: Player) => player.playerName === user
-        );
-
-        if (userData) {
-          setPlaying(true);
-        }
+      const activeUser = tableData.players.filter(
+        (player) => player.activePlayer
+      );
+      if (activeUser.length > 0 && user === activeUser[0]?.playerName) {
+        setPlaying(true);
+        setChips(activeUser[0].chips);
       }
       setTable(tableData);
       setCount(tableData.count);
@@ -142,6 +120,15 @@ const Table = ({ route, navigation }: any) => {
     socket.on("foundTable", (tableData: TableType) => {
       setTable(tableData);
       setActivePlayer(tableData.players.filter((p: Player) => p.activePlayer));
+    });
+    socket.on("dealerPlay", (dealer: Player[]) => {
+      if (dealer[0].score < 17 && dealer[0].activePlayer) {
+        socket.emit("dealerHit", {
+          room_id: id,
+        });
+      } else {
+        reset();
+      }
     });
   }, [socket]);
   return (
@@ -249,9 +236,6 @@ const Table = ({ route, navigation }: any) => {
             onPress={doubleDown}
           >
             <Text>Double Down</Text>
-          </Pressable>
-          <Pressable style={styles.messagingbuttonContainer} onPress={reset}>
-            <Text>Reset</Text>
           </Pressable>
         </View>
       )}

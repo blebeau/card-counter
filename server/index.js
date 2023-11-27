@@ -15,8 +15,6 @@ const startingHands = require("./utils/startingHand");
 const finder = require("./utils/helpers");
 
 const { getCount, score, payout } = require('./utils/score');
-const e = require("express");
-
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -38,6 +36,7 @@ socketIO.on("connection", (socket) => {
 	socket.on("findRoom", (id) => {
 		let room = finder(chatRooms, id)
 
+
 		socket.emit("foundRoom", room[0].messages);
 	});
 
@@ -53,6 +52,10 @@ socketIO.on("connection", (socket) => {
 
 	socket.on("findTable", (id) => {
 		let result = finder(tables, id)
+
+		const active = result[0].players.filter(
+			(player) => player.activePlayer
+		);
 
 		socket.emit("foundTable", result[0]);
 	});
@@ -82,7 +85,7 @@ socketIO.on("connection", (socket) => {
 		socket.emit("gameStarted", thisTable[0]);
 	});
 
-	socket.on("newMessage", (data) => { // Similar to what dealing will be
+	socket.on("newMessage", (data) => {
 		const { room_id, message, user, timestamp } = data;
 		let room = finder(chatRooms, room_id)
 		const newMessage = {
@@ -117,51 +120,36 @@ socketIO.on("connection", (socket) => {
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", table[0]);
+
+
 	});
 
-	// socket.on("dealerHit", (data) => {
-	// 	console.log("dealerHit")
-	// 	const { room_id } = data;
-	// 	let table = finder(tables, room_id)
+	socket.on("dealerHit", (data) => {
+		const { room_id } = data;
+		let table = finder(tables, room_id)
 
-	// 	let player = table[0].players.filter((p) => p.playerName === "dealer")
+		let player = table[0].players.filter((p) => p.playerName == "dealer")
 
-	// 	const playerScore = score(player[0].hand)
-	// 	const count = getCount(table[0].countedCards)
+		const card = table[0].shoe.splice(0, 1)
 
-	// 	player[0].score = playerScore;
-	// 	table[0].count = count;
+		player[0].hand = player[0].hand.concat(card)
+		table[0].countedCards = table[0].countedCards.concat(card)
 
-	// 	let dealerScore = playerScore
+		const playerScore = score(player[0].hand)
+		const count = getCount(table[0].countedCards)
 
-	// 	while (dealerScore < 17) {
-	// 		console.log("while loop")
+		player[0].score = playerScore;
+		table[0].count = count;
 
-	// 		const card = table[0].shoe.splice(0, 1)
+		socket.emit("tableList", tables);
+		socket.emit("foundTable", table[0]);
+		socket.emit("dealerPlay", player);
 
-	// 		player[0].hand = player[0].hand.concat(card)
-	// 		table[0].countedCards = table[0].countedCards.concat(card)
-
-	// 		const playerScore = score(player[0].hand)
-	// 		const count = getCount(table[0].countedCards)
-
-	// 		dealerScore = playerScore
-
-	// 		player[0].score = playerScore;
-	// 		table[0].count = count;
-	// 	}
-	// 	console.log("round end - dealerHit")
-	// 	socket.emit("roundEnded")
-	// 	socket.emit("tableList", tables);
-	// 	socket.emit("foundTable", table[0]);
-
-	// });
+	});
 
 	socket.on("stay", (data) => {
-		console.log('stay')
 		const { room_id, user } = data;
 		let table = finder(tables, room_id)
-		console.log("here 1")
 		table[0].players.filter((p) => !p.activePlayer)[0].activePlayer = true
 
 		table[0].players.filter((p) => p.playerName == user)[0].activePlayer = false
@@ -169,7 +157,6 @@ socketIO.on("connection", (socket) => {
 		const activePlayer = table[0].players.find(player => player.activePlayer)
 
 		if (activePlayer.playerName === "dealer") {
-			console.log("here 2")
 			const dealer = table[0].players.filter(player => player.playerName === "dealer")
 
 			table[0].countedCards = table[0].countedCards.concat(dealer[0].hand[1])
@@ -179,49 +166,14 @@ socketIO.on("connection", (socket) => {
 
 			dealer[0].score = playerScore;
 			table[0].count = count;
-		}
 
-		socket.to(table[0].players).emit("playerStay", table[0].players);
+			socket.emit("tableList", tables);
+			socket.emit("foundTable", table[0]);
+			socket.emit("dealerPlay", dealer);
+		}
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", table[0]);
-
-		if (activePlayer.playerName === "dealer") {
-			console.log("dealerHit")
-			const { room_id } = data;
-			let table = finder(tables, room_id)
-
-			let player = table[0].players.filter((p) => p.playerName === "dealer")
-
-			const playerScore = score(player[0].hand)
-			const count = getCount(table[0].countedCards)
-
-			player[0].score = playerScore;
-			table[0].count = count;
-
-			let dealerScore = playerScore
-
-			while (dealerScore < 17) {
-				console.log("while loop")
-
-				const card = table[0].shoe.splice(0, 1)
-
-				player[0].hand = player[0].hand.concat(card)
-				table[0].countedCards = table[0].countedCards.concat(card)
-
-				const playerScore = score(player[0].hand)
-				const count = getCount(table[0].countedCards)
-
-				dealerScore = playerScore
-
-				player[0].score = playerScore;
-				table[0].count = count;
-			}
-			console.log("round end - dealerHit")
-			// socket.emit("roundEnded")
-			socket.emit("tableList", tables);
-			socket.emit("foundTable", table[0]);
-		}
 	});
 
 	socket.on("reset", (data) => {
@@ -244,10 +196,7 @@ socketIO.on("connection", (socket) => {
 
 		const newTable = startingHands(table[0])
 
-		console.log("newTable", JSON.stringify(newTable))
-
 		newTable.players.forEach(player => {
-			console.log("player", player)
 			if (player.playerName === "dealer") {
 				player.score = 0;
 			} else {
@@ -260,13 +209,9 @@ socketIO.on("connection", (socket) => {
 
 		newTable.count = count;
 
-		socket.emit("gameReset", newTable)
-
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", newTable);
 	});
-
-
 
 	socket.on("disconnect", () => {
 		socket.disconnect();
