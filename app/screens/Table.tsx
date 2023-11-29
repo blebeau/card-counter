@@ -107,7 +107,6 @@ const Table = ({ route, navigation }: any) => {
         (player) => player.activePlayer
       );
       if (activeUser.length > 0 && user === activeUser[0]?.playerName) {
-        setPlaying(true);
         setChips(activeUser[0].chips);
       }
       setTable(tableData);

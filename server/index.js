@@ -15,6 +15,7 @@ const startingHands = require("./utils/startingHand");
 const finder = require("./utils/helpers");
 
 const { getCount, score, payout } = require('./utils/score');
+const updateActivePlayer = require('./utils/updateActivePlayer');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -150,9 +151,7 @@ socketIO.on("connection", (socket) => {
 	socket.on("stay", (data) => {
 		const { room_id, user } = data;
 		let table = finder(tables, room_id)
-		table[0].players.filter((p) => !p.activePlayer)[0].activePlayer = true
-
-		table[0].players.filter((p) => p.playerName == user)[0].activePlayer = false
+		table[0].players = updateActivePlayer(table[0].players)
 
 		const activePlayer = table[0].players.find(player => player.activePlayer)
 
@@ -180,9 +179,7 @@ socketIO.on("connection", (socket) => {
 		const { room_id } = data;
 
 		let table = finder(tables, room_id)
-
-		table[0].players.filter((p) => p.activePlayer)[0].activePlayer = false
-		table[0].players[0].activePlayer = true
+		table[0].players = updateActivePlayer(table[0].players)
 
 		table[0] = payout(table)
 
