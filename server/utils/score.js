@@ -74,18 +74,17 @@ exports.payout = (table) => {
 	const dealerScore = dealer[0].score
 	table[0].players.forEach(player => {
 		if (player.playerName !== 'dealer') {
-			if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
-				player.chips -= player.betValue
-			}
-			if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
-				player.chips += player.betValue
-			}
 			if (player.score === 21 && player.hand.length === 2) {
-				player.chips += (player.betValue * 1.5)
+				player.chips += (player.betAmount * 1.5)
+			}
+			else if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
+				player.chips -= player.betAmount
+			}
+			else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
+				player.chips += player.betAmount
 			}
 		}
 		player.hand = []
 	})
-
 	return table[0]
 }
