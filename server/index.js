@@ -75,6 +75,14 @@ socketIO.on("connection", (socket) => {
 
 		thisTable[0] = startingHands(thisTable[0]) // only runs for users without a hand
 
+		const offerInsurance = thisTable[0].players.find(player => player.playerName === "dealer" &&
+			player.hand[1].card.includes("a")
+		)
+
+		if (offerInsurance) {
+			socket.emit("offerInsurance")
+		}
+
 		const thisPlayer = thisTable[0].players.filter(player => player.playerName === user)
 
 		const playerScore = score(thisPlayer[0].hand)
@@ -177,7 +185,6 @@ socketIO.on("connection", (socket) => {
 
 	socket.on("reset", (data) => {
 		const { room_id } = data;
-
 		let table = finder(tables, room_id)
 		table[0].players = updateActivePlayer(table[0].players)
 
@@ -226,5 +233,3 @@ app.get("/api/tables", (req, res) => {
 http.listen(PORT, () => {
 	console.log(`Server listening on ${PORT}`);
 });
-
-module.exports = { startingHands }

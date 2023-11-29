@@ -20,6 +20,8 @@ const Table = ({ route, navigation }: any) => {
   const [table, setTable] = useState<TableType>();
   const [activePlayer, setActivePlayer] = useState<Player[]>([]);
   const [playing, setPlaying] = useState<boolean>(false);
+  const [insurance, setInsurance] = useState<boolean>(false);
+  const [split, setSplit] = useState<boolean>(false);
   const [count, setCount] = useState<number>(0);
   const [chips, setChips] = useState<number>(0);
   const [bet, setBet] = useState<number>(50);
@@ -92,6 +94,10 @@ const Table = ({ route, navigation }: any) => {
     });
   };
 
+  const insureRound = () => {};
+
+  const splitHand = () => {};
+
   const setBetValue = (value: string) => {
     const intValue = parseInt(value);
 
@@ -128,6 +134,12 @@ const Table = ({ route, navigation }: any) => {
       } else {
         reset();
       }
+    });
+    socket.on("offerInsurance", () => {
+      setInsurance(true);
+    });
+    socket.on("canSplit", () => {
+      setSplit(true);
     });
   }, [socket]);
   return (
@@ -235,6 +247,20 @@ const Table = ({ route, navigation }: any) => {
             onPress={doubleDown}
           >
             <Text>Double Down</Text>
+          </Pressable>
+          <Pressable
+            disabled={insurance}
+            style={styles.messagingbuttonContainer}
+            onPress={doubleDown}
+          >
+            <Text>Insurance</Text>
+          </Pressable>
+          <Pressable
+            disabled={split}
+            style={styles.messagingbuttonContainer}
+            onPress={doubleDown}
+          >
+            <Text>Split</Text>
           </Pressable>
         </View>
       )}

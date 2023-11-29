@@ -34,13 +34,19 @@ exports.score = (cards) => {
 	let aceCount = 0;
 	let playerScore = 0;
 	const cardValue = (card) => {
-		const cardDenomination = card.match(/\d+/)
-		if (!cardDenomination) return
+		const cardDenomination = card.match(/\d+/) // gets the number value from the card string
+		if (!cardDenomination) return // face cards and aces
 		return cardDenomination[0]
 	}
 
+	// Counting cards is simply creating a metric, the count, to identify the 
+	// amount of 10s in the deck. High count means more 10s.
+	// Cards are valued as;
+	// 2 - 6 => count increases by 1 for each
+	// 7 - 9 => count does not change
+	// 10 value cards and aces => count decreases by 1 for each
+
 	cards.forEach((card) => {
-		// gets number from the card string as a string
 		const cardScore = cardValue(card.card)
 
 		if (card.card.includes("a")) {
@@ -51,7 +57,6 @@ exports.score = (cards) => {
 			playerScore += 10
 		}
 
-		// adds the number to the playerScore
 		else if (parseInt(cardScore) < 7) {
 			playerScore += parseInt(cardScore)
 		} else {
@@ -59,9 +64,12 @@ exports.score = (cards) => {
 		}
 
 	});
-	if (aceCount > 0) { // Set ace value as 1 or 11
+	if (aceCount > 0) {
+		// checks the value of all cards with ace as 1.
+		// Then, if the score is 11 or less, increase by 10.
+		// Since 2 aces at 11 === 22, only 1 ace will ever be worth 11 in a hand.
 		playerScore += aceCount
-		if ((playerScore + 10) < 22) {
+		if (playerScore <= 11) {
 			playerScore += 10
 		}
 	}
@@ -74,14 +82,18 @@ exports.payout = (table) => {
 	const dealerScore = dealer[0].score
 	table[0].players.forEach(player => {
 		if (player.playerName !== 'dealer') {
-			if (player.score === 21 && player.hand.length === 2) {
-				player.chips += (player.betAmount * 1.5)
+			if (player.score === dealerScore) {
+				return
+			}
+			else if (player.score === 21 && player.hand.length === 2) {
+				// blackjack is starting with 21 and pays 3:2
+				return player.chips += (player.betAmount * 1.5)
 			}
 			else if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
-				player.chips -= player.betAmount
+				return player.chips -= player.betAmount
 			}
 			else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
-				player.chips += player.betAmount
+				return player.chips += player.betAmount
 			}
 		}
 		player.hand = []
