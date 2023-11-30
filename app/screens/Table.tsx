@@ -273,6 +273,7 @@ const Table = ({ route, navigation }: any) => {
           betAmount={bet}
           user={user}
           id={id}
+          socket={socket}
         />
       )}
     </View>
@@ -334,7 +335,7 @@ const inlineStyles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   gameButtons: {
-    width: "20%",
+    width: "15%",
     backgroundColor: "green",
     borderRadius: 3,
     margin: 5,
@@ -342,7 +343,7 @@ const inlineStyles = StyleSheet.create({
     justifyContent: "center",
   },
   disabledGameButtons: {
-    width: "20%",
+    width: "15%",
     backgroundColor: "grey",
     opacity: 0.5,
     borderRadius: 3,

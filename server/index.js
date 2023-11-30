@@ -226,15 +226,13 @@ socketIO.on("connection", (socket) => {
 		socket.emit("foundTable", newTable);
 	});
 
-	socket.on("insurance", (data) => {
-		const { user, insuranceAmount, id } = data;
+	socket.on("insurance", (user, insuranceAmount, id) => {
 
-		const table = tables.find(table => table.id = id)
+		let table = finder(tables, id)
 
-		const dealer = table.players.find(player => player.playerName === dealer)
-		const player = table.players.find(player => player.playerName === user)
-
-		const dealerScore = score(dealer)
+		const dealer = table[0].players.find(player => player.playerName === "dealer")
+		const player = table[0].players.find(player => player.playerName === user)
+		const dealerScore = score(dealer.cards)
 
 		if (dealerScore === 21) {
 			player.chips = player.chips - player.betValue + (2 * insuranceAmount)
@@ -243,7 +241,7 @@ socketIO.on("connection", (socket) => {
 			player.chips -= player.betValue
 		}
 		socket.emit("tableList", tables);
-		socket.emit("foundTable", newTable);
+		socket.emit("foundTable", table[0]);
 	})
 
 	socket.on("disconnect", () => {
