@@ -22,8 +22,8 @@ const InsuranceModal = ({
   const [insuranceAmount, setInsuranceAmount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
-  const chooseInsurance = (getInsurance: boolean) => {
-    socket.emit("insurance", user, insuranceAmount, getInsurance, id);
+  const chooseInsurance = () => {
+    socket.emit("insurance", user, insuranceAmount, id);
 
     closeModal();
   };
@@ -61,17 +61,8 @@ const InsuranceModal = ({
         </Text>
       )}
       <View style={styles.modalbuttonContainer}>
-        <Pressable
-          style={styles.modalbutton}
-          onPress={() => chooseInsurance(true)}
-        >
+        <Pressable style={styles.modalbutton} onPress={() => chooseInsurance()}>
           <Text style={styles.modaltext}>YES</Text>
-        </Pressable>
-        <Pressable
-          style={styles.modalbutton}
-          onPress={() => chooseInsurance(false)}
-        >
-          <Text style={styles.modaltext}>NO</Text>
         </Pressable>
       </View>
     </View>

@@ -228,37 +228,39 @@ const Table = ({ route, navigation }: any) => {
 
       {!playing ? (
         <View style={[styles.playerOptionsConatainer]}>
-          <Pressable
-            style={styles.messagingbuttonContainer}
-            onPress={startGame}
-          >
+          <Pressable style={inlineStyles.gameButtons} onPress={startGame}>
             <Text>Join Game</Text>
           </Pressable>
         </View>
       ) : (
         <View style={[styles.playerOptionsConatainer]}>
-          <Pressable style={styles.messagingbuttonContainer} onPress={hit}>
+          <Pressable style={inlineStyles.gameButtons} onPress={hit}>
             <Text>Hit</Text>
           </Pressable>
-          <Pressable style={styles.messagingbuttonContainer} onPress={stay}>
+          <Pressable style={inlineStyles.gameButtons} onPress={stay}>
             <Text>Stay</Text>
           </Pressable>
-          <Pressable
-            style={styles.messagingbuttonContainer}
-            onPress={doubleDown}
-          >
+          <Pressable style={inlineStyles.gameButtons} onPress={doubleDown}>
             <Text>Double Down</Text>
           </Pressable>
           <Pressable
             disabled={insurance}
-            style={styles.messagingbuttonContainer}
+            style={
+              insurance
+                ? inlineStyles.gameButtons
+                : inlineStyles.disabledGameButtons
+            }
             onPress={doubleDown}
           >
             <Text>Insurance</Text>
           </Pressable>
           <Pressable
             disabled={split}
-            style={styles.messagingbuttonContainer}
+            style={
+              split
+                ? inlineStyles.gameButtons
+                : inlineStyles.disabledGameButtons
+            }
             onPress={doubleDown}
           >
             <Text>Split</Text>
@@ -330,5 +332,22 @@ const inlineStyles = StyleSheet.create({
     width: "20%",
     height: "100%",
     justifyContent: "flex-start",
+  },
+  gameButtons: {
+    width: "20%",
+    backgroundColor: "green",
+    borderRadius: 3,
+    margin: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  disabledGameButtons: {
+    width: "20%",
+    backgroundColor: "grey",
+    opacity: 0.5,
+    borderRadius: 3,
+    margin: 5,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

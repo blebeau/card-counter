@@ -82,18 +82,15 @@ exports.payout = (table) => {
 	const dealerScore = dealer[0].score
 	table[0].players.forEach(player => {
 		if (player.playerName !== 'dealer') {
-			if (player.score === dealerScore) {
-				return
-			}
-			else if (player.score === 21 && player.hand.length === 2) {
+			if (player.score === 21 && player.hand.length === 2) {
 				// blackjack is starting with 21 and pays 3:2
-				return player.chips += (player.betAmount * 1.5)
+				player.chips += (player.betAmount * 1.5)
 			}
 			else if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
-				return player.chips -= player.betAmount
+				player.chips -= player.betAmount
 			}
 			else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
-				return player.chips += player.betAmount
+				player.chips += player.betAmount
 			}
 		}
 		player.hand = []
