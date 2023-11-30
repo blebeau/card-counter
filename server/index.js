@@ -71,7 +71,7 @@ socketIO.on("connection", (socket) => {
 		}
 
 		const activePlayer = !thisTable[0].players.find(player => player?.activePlayer)
-		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000, betValue: 50 })
+		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000, betValue: 50, insurance: 0 })
 
 		thisTable[0] = startingHands(thisTable[0]) // only runs for users without a hand
 
@@ -213,9 +213,38 @@ socketIO.on("connection", (socket) => {
 
 		newTable.count = count;
 
+		const offerInsurance = thisTable[0].players.find(player =>
+			player.playerName === "dealer" &&
+			player.hand[1].card.includes("a")
+		)
+
+		if (offerInsurance) {
+			socket.emit("offerInsurance")
+		}
+
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", newTable);
 	});
+
+	socket.on("insurance", (data) => {
+		const { user, insuranceAmount, getInsurance, id } = data;
+
+		const table = tables.find(table => table.id = id)
+
+		const dealer = table.players.find(player => player.playerName === dealer)
+		const player = table.players.find(player => player.playerName === user)
+
+		const dealerScore = score(dealer)
+
+		if (dealerScore === 21) {
+			player.chips = player.chips - player.betValue + (2 * insuranceAmount)
+		}
+		else {
+			player.chips -= player.betValue
+		}
+		socket.emit("tableList", tables);
+		socket.emit("foundTable", newTable);
+	})
 
 	socket.on("disconnect", () => {
 		socket.disconnect();

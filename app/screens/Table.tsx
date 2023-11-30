@@ -12,6 +12,7 @@ import { styles } from "../utils/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { deckArray } from "../utils/deck";
 import { Card, Player, TableType } from "../types/types";
+import InsuranceModal from "../components/InsuranceModal";
 
 const Table = ({ route, navigation }: any) => {
   const [user, setUser] = useState("");
@@ -263,6 +264,14 @@ const Table = ({ route, navigation }: any) => {
             <Text>Split</Text>
           </Pressable>
         </View>
+      )}
+      {insurance && (
+        <InsuranceModal
+          setVisible={setInsurance}
+          betAmount={bet}
+          user={user}
+          id={id}
+        />
       )}
     </View>
   );

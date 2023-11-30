@@ -3,21 +3,27 @@ import React, { useState } from "react";
 // import socket from "../utils/socket";
 import { styles } from "../utils/styles";
 import socket from "../utils/socket";
-import { Player } from "../types/types";
+import { Player, TableType } from "../types/types";
 
 type InsuranceModal = {
   setVisible: any;
   betAmount: number;
-  player: Player;
+  user: string;
+  id: string;
 };
 
-const InsuranceModal = ({ setVisible, betAmount, player }: InsuranceModal) => {
+const InsuranceModal = ({
+  setVisible,
+  betAmount,
+  user,
+  id,
+}: InsuranceModal) => {
   const closeModal = () => setVisible(false);
   const [insuranceAmount, setInsuranceAmount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
   const chooseInsurance = (getInsurance: boolean) => {
-    socket.emit("insurance", player, getInsurance);
+    socket.emit("insurance", user, insuranceAmount, getInsurance, id);
 
     closeModal();
   };
@@ -38,7 +44,7 @@ const InsuranceModal = ({ setVisible, betAmount, player }: InsuranceModal) => {
         onChangeText={(text) => {
           const intValue = parseInt(text);
 
-          if (intValue > betAmount) {
+          if (intValue > betAmount / 2) {
             setError(true);
           } else {
             setError(false);
