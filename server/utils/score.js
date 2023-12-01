@@ -84,13 +84,13 @@ exports.payout = (table) => {
 		if (player.playerName !== 'dealer') {
 			if (player.score === 21 && player.hand.length === 2) {
 				// blackjack is starting with 21 and pays 3:2
-				player.chips += (player.betAmount * 1.5)
+				player.chips += (player.bet * 1.5)
 			}
 			else if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
-				player.chips -= player.betAmount
+				player.chips -= player.bet
 			}
 			else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
-				player.chips += player.betAmount
+				player.chips += player.bet
 			}
 		}
 		player.hand = []

@@ -12,7 +12,7 @@ const testingTable = [
 					{ card: 'd9', cardLink: '../utils/PNG-cards/d9.png' },
 				],
 				chips: 100,
-				betAmount: 50,
+				bet: 50,
 				score: 18
 			},
 			{
@@ -22,7 +22,7 @@ const testingTable = [
 					{ card: 'd10', cardLink: '../utils/PNG-cards/d10.png' }
 				],
 				chips: 100,
-				betAmount: 50,
+				bet: 50,
 				score: 20
 			},
 			{
@@ -32,7 +32,7 @@ const testingTable = [
 					{ card: 'h10', cardLink: '../utils/PNG-cards/h10.png' }
 				],
 				chips: 100,
-				betAmount: 50,
+				bet: 50,
 				score: 21
 			},
 			{
@@ -42,7 +42,7 @@ const testingTable = [
 					{ card: 'c9', cardLink: '../utils/PNG-cards/c9.png' }
 				],
 				chips: 100,
-				betAmount: 50,
+				bet: 50,
 				score: 19
 			},
 			{

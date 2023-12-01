@@ -54,10 +54,6 @@ socketIO.on("connection", (socket) => {
 	socket.on("findTable", (id) => {
 		let result = finder(tables, id)
 
-		const active = result[0].players.filter(
-			(player) => player.activePlayer
-		);
-
 		socket.emit("foundTable", result[0]);
 	});
 
@@ -71,7 +67,7 @@ socketIO.on("connection", (socket) => {
 		}
 
 		const activePlayer = !thisTable[0].players.find(player => player?.activePlayer)
-		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000, betValue: 50 })
+		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000, bet: 50 })
 
 		thisTable[0] = startingHands(thisTable[0]) // only runs for users without a hand
 
@@ -187,7 +183,6 @@ socketIO.on("connection", (socket) => {
 		const { room_id } = data;
 		let table = finder(tables, room_id)
 		table[0].players = updateActivePlayer(table[0].players)
-
 		table[0] = payout(table)
 
 		if (table[0].shoe.length < (table[0].players.length * 4)) {
@@ -232,13 +227,13 @@ socketIO.on("connection", (socket) => {
 
 		const dealer = table[0].players.find(player => player.playerName === "dealer")
 		const player = table[0].players.find(player => player.playerName === user)
-		const dealerScore = score(dealer.cards)
-
+		const dealerScore = score(dealer.hand)
 		if (dealerScore === 21) {
-			player.chips = player.chips - player.betValue + (2 * insuranceAmount)
+			player.chips = player.chips - player.bet + (2 * insuranceAmount)
+			socket.emit("dealerPlay", dealer);
 		}
 		else {
-			player.chips -= player.betValue
+			player.chips -= player.bet
 		}
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", table[0]);

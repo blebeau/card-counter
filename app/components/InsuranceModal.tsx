@@ -26,7 +26,6 @@ const InsuranceModal = ({
 
   const updateKeysWithInputHandler = (val: string) => {
     const keyInt = parseInt(val);
-    console.log(val);
     if (keyInt > betAmount / 2) {
       setError(true);
     } else {
@@ -37,12 +36,10 @@ const InsuranceModal = ({
   };
 
   const confirmInsurance = (user: string, amount: number, id: string) => {
-    console.log("InsuranceModal user, insuranceAmount, id", user, amount, id);
     socket.emit("insurance", user, amount || 0, id);
 
     closeModal();
   };
-  console.log("betAmount, user, id ", betAmount, user, id);
   return (
     <View
       style={{

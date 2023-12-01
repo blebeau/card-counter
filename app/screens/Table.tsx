@@ -24,7 +24,6 @@ const Table = ({ route, navigation }: any) => {
   const [insurance, setInsurance] = useState<boolean>(false);
   const [split, setSplit] = useState<boolean>(false);
   const [count, setCount] = useState<number>(0);
-  const [chips, setChips] = useState<number>(0);
   const [bet, setBet] = useState<number>(50);
 
   const getUsername = async () => {
@@ -83,7 +82,6 @@ const Table = ({ route, navigation }: any) => {
         (p: Player) => p.activePlayer
       );
       setActivePlayer(getActivePlayer);
-      setChips(getActivePlayer[0].chips);
       setTable(tableData);
     });
   };
@@ -91,7 +89,6 @@ const Table = ({ route, navigation }: any) => {
   const reset = () => {
     socket.emit("reset", {
       room_id: id,
-      betValue: bet,
     });
   };
 
@@ -107,15 +104,8 @@ const Table = ({ route, navigation }: any) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: name });
-    getUsername();
     socket.emit("findTable", id);
     socket.on("foundTable", (tableData: TableType) => {
-      const activeUser = tableData.players.filter(
-        (player) => player.activePlayer
-      );
-      if (activeUser.length > 0 && user === activeUser[0]?.playerName) {
-        setChips(activeUser[0].chips);
-      }
       setTable(tableData);
       setCount(tableData.count);
     });
@@ -190,6 +180,9 @@ const Table = ({ route, navigation }: any) => {
                 >
                   <Text>{player.score}</Text>
                   <Text>{player.playerName}</Text>
+                  {player.playerName !== "dealer" && (
+                    <Text>Chips: {player.chips}</Text>
+                  )}
                   <View style={inlineStyles.player}>
                     {player.hand.map((card: Card, index: number) => {
                       const cardFinder = deckArray.find(
