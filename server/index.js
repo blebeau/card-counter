@@ -153,7 +153,7 @@ socketIO.on("connection", (socket) => {
 	});
 
 	socket.on("stay", (data) => {
-		const { room_id, user, doubleDown } = data;
+		const { room_id } = data;
 		let table = finder(tables, room_id)
 		table[0].players = updateActivePlayer(table[0].players)
 

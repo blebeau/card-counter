@@ -9,7 +9,7 @@ export type Player = {
   score: number;
   chips: number;
   bet: number;
-  hand: Card[];
+  hand: any;
 };
 
 export type TableType = {
