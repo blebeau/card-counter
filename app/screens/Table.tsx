@@ -46,20 +46,23 @@ const Table = ({ route, navigation }: any) => {
     }
   };
 
-  const doubleDown = () => {
+  const doubleDown = async () => {
     if (user) {
-      socket.emit("doubleDown", {
+      await socket.emit("hit", {
         room_id: id,
         user,
       });
+
+      stay(true);
     }
   };
 
-  const stay = () => {
+  const stay = (doubleDown?: boolean) => {
     if (user) {
       socket.emit("stay", {
         room_id: id,
         user,
+        doubleDown: doubleDown,
       });
     }
   };
@@ -94,7 +97,12 @@ const Table = ({ route, navigation }: any) => {
 
   const insureRound = () => {};
 
-  const splitHand = () => {};
+  const splitHand = () => {
+    socket.emit("reset", {
+      tableId: id,
+      user,
+    });
+  };
 
   const setBetValue = (value: string) => {
     const intValue = parseInt(value);
@@ -138,7 +146,6 @@ const Table = ({ route, navigation }: any) => {
       <View style={inlineStyles.gameDetailContainer}>
         <View style={inlineStyles.gameDetail}>
           <Text>Count: {count}</Text>
-          <Text>Chips: {chips}</Text>
           <View
             style={{
               flexDirection: "row",
@@ -148,13 +155,7 @@ const Table = ({ route, navigation }: any) => {
           >
             <Text>Bet: </Text>
             <TextInput
-              style={{
-                backgroundColor: "lightgrey",
-                borderColor: "black",
-                width: 100,
-                height: 25,
-                borderWidth: 1,
-              }}
+              style={inlineStyles.textInput}
               onChangeText={(text) => {
                 const intValue = parseInt(text);
 
@@ -230,7 +231,7 @@ const Table = ({ route, navigation }: any) => {
           <Pressable style={inlineStyles.gameButtons} onPress={hit}>
             <Text>Hit</Text>
           </Pressable>
-          <Pressable style={inlineStyles.gameButtons} onPress={stay}>
+          <Pressable style={inlineStyles.gameButtons} onPress={() => stay()}>
             <Text>Stay</Text>
           </Pressable>
           <Pressable style={inlineStyles.gameButtons} onPress={doubleDown}>
@@ -254,7 +255,7 @@ const Table = ({ route, navigation }: any) => {
                 ? inlineStyles.gameButtons
                 : inlineStyles.disabledGameButtons
             }
-            onPress={doubleDown}
+            onPress={splitHand}
           >
             <Text>Split</Text>
           </Pressable>
@@ -343,5 +344,13 @@ const inlineStyles = StyleSheet.create({
     margin: 5,
     alignItems: "center",
     justifyContent: "center",
+  },
+  textInput: {
+    backgroundColor: "lightgrey",
+    borderColor: "black",
+    width: 100,
+    height: 25,
+    borderWidth: 1,
+    padding: 5,
   },
 });

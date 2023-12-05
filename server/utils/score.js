@@ -87,13 +87,14 @@ exports.payout = (table) => {
 				player.chips += (player.bet * 1.5)
 			}
 			else if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
-				player.chips -= player.bet
+				player.chips -= player.doubleDown ? player.bet * 2 : player.bet
 			}
 			else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
-				player.chips += player.bet
+				player.chips += player.doubleDown ? player.bet * 2 : player.bet
 			}
 		}
 		player.hand = []
+		player.doubleDown = false
 	})
 	return table[0]
 }

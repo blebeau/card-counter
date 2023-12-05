@@ -67,7 +67,7 @@ socketIO.on("connection", (socket) => {
 		}
 
 		const activePlayer = !thisTable[0].players.find(player => player?.activePlayer)
-		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000, bet: 50 })
+		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000, bet: 50, doubleDown: false })
 
 		thisTable[0] = startingHands(thisTable[0]) // only runs for users without a hand
 
@@ -107,10 +107,12 @@ socketIO.on("connection", (socket) => {
 	});
 
 	socket.on("hit", (data) => {
-		const { room_id, user } = data;
+		const { room_id, user, doubleDown } = data;
 		let table = finder(tables, room_id)
 
 		let player = table[0].players.filter((p) => p.playerName == user)
+
+		player[0].doubleDown = doubleDown || false
 
 		const card = table[0].shoe.splice(0, 1)
 
@@ -125,8 +127,6 @@ socketIO.on("connection", (socket) => {
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", table[0]);
-
-
 	});
 
 	socket.on("dealerHit", (data) => {
@@ -153,7 +153,7 @@ socketIO.on("connection", (socket) => {
 	});
 
 	socket.on("stay", (data) => {
-		const { room_id, user } = data;
+		const { room_id, user, doubleDown } = data;
 		let table = finder(tables, room_id)
 		table[0].players = updateActivePlayer(table[0].players)
 
@@ -242,6 +242,39 @@ socketIO.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		socket.disconnect();
 		console.log("🔥: A user disconnected");
+	});
+
+	socket.on("doubleDown", (tableId, playerName) => {
+		const { room_id, user } = data;
+		let table = finder(tables, room_id)
+
+		let player = table[0].players.filter((p) => p.playerName == user)
+
+		const card = table[0].shoe.splice(0, 1)
+
+		player[0].hand = player[0].hand.concat(card)
+		table[0].countedCards = table[0].countedCards.concat(card)
+
+		const playerScore = score(player[0].hand)
+		const count = getCount(table[0].countedCards)
+
+		player[0].score = playerScore;
+		table[0].count = count;
+
+		socket.emit("tableList", tables);
+		socket.emit("foundTable", table[0]);
+	});
+
+	socket.on("split", (tableId, playerName) => {
+
+		const table = tables.find(table => table.id === tableId)
+
+		const player = table.players.find(player => player.playerName === playerName)
+
+		player.hand = player.hand.map(card => [card])
+
+
+
 	});
 });
 
