@@ -116,6 +116,8 @@ socketIO.on("connection", (socket) => {
 
 		const card = table[0].shoe.splice(0, 1)
 
+
+
 		player[0].hand = player[0].hand.concat(card)
 		table[0].countedCards = table[0].countedCards.concat(card)
 
@@ -266,15 +268,17 @@ socketIO.on("connection", (socket) => {
 	});
 
 	socket.on("split", (tableId, playerName) => {
-
 		const table = tables.find(table => table.id === tableId)
 
 		const player = table.players.find(player => player.playerName === playerName)
 
-		player.hand = player.hand.map(card => [card])
+		player.splitHand = player.hand.splice(1, 1)
 
+		player.score = score(player.hand)
+		player.splitScore = score(player.splitHand)
 
-
+		socket.emit("tableList", tables);
+		socket.emit("foundTable", table[0]);
 	});
 });
 

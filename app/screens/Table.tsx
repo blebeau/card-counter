@@ -98,7 +98,7 @@ const Table = ({ route, navigation }: any) => {
   const insureRound = () => {};
 
   const splitHand = () => {
-    socket.emit("reset", {
+    socket.emit("split", {
       tableId: id,
       user,
     });
@@ -185,41 +185,11 @@ const Table = ({ route, navigation }: any) => {
                     <Text>Chips: {player.chips}</Text>
                   )}
                   <View style={inlineStyles.player}>
-                    {player.hand.length > 1 // split hand
-                      ? player.hand.forEach((hand: Card[]) => {
-                          hand.map((card: Card) => {
-                            const cardFinder = deckArray.find(
-                              (x) => x.card === card.card
-                            );
-                            return (
-                              <View key={card.card}>
-                                <Image
-                                  source={cardFinder?.cardLink}
-                                  style={inlineStyles.image}
-                                />
-                              </View>
-                            );
-                          });
-                        })
-                      : player.hand.map((card: Card, index: number) => {
+                    {player.splitHand
+                      ? player.hand.map((card: Card, index: number) => {
                           const cardFinder = deckArray.find(
                             (x) => x.card === card.card
                           );
-                          if (
-                            index === 0 &&
-                            activePlayer.length > 0 &&
-                            player.playerName === "dealer" &&
-                            activePlayer[0].playerName !== "dealer"
-                          ) {
-                            return (
-                              <View key="back-of-card">
-                                <Image
-                                  source={require("../utils/PNG-cards/backOfCard.png")}
-                                  style={inlineStyles.image}
-                                />
-                              </View>
-                            );
-                          }
                           return (
                             <View key={card.card}>
                               <Image
@@ -228,7 +198,36 @@ const Table = ({ route, navigation }: any) => {
                               />
                             </View>
                           );
-                        })}
+                        })
+                      : ""}
+                    {player.hand.map((card: Card, index: number) => {
+                      const cardFinder = deckArray.find(
+                        (x) => x.card === card.card
+                      );
+                      if (
+                        index === 0 &&
+                        activePlayer.length > 0 &&
+                        player.playerName === "dealer" &&
+                        activePlayer[0].playerName !== "dealer"
+                      ) {
+                        return (
+                          <View key="back-of-card">
+                            <Image
+                              source={require("../utils/PNG-cards/backOfCard.png")}
+                              style={inlineStyles.image}
+                            />
+                          </View>
+                        );
+                      }
+                      return (
+                        <View key={card.card}>
+                          <Image
+                            source={cardFinder?.cardLink}
+                            style={inlineStyles.image}
+                          />
+                        </View>
+                      );
+                    })}
                   </View>
                 </View>
               );

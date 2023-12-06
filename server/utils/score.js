@@ -80,24 +80,30 @@ exports.score = (cards) => {
 exports.payout = (table) => {
 	const dealer = table[0].players.filter(player => player.playerName === "dealer")
 	const dealerScore = dealer[0].score
+
 	table[0].players.forEach(player => {
 		if (player.playerName !== 'dealer') {
-			if (player.hand.length > 1) {
-				this.splitPayout(player, dealerScore)
-				return
-			} else {
-				if (player.score === 21 && player.hand.length === 2) {
-					// blackjack is starting with 21 and pays 3:2
-					player.chips += (player.bet * 1.5)
-				}
-				else if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
-					player.chips -= player.doubleDown ? player.bet * 2 : player.bet
-				}
-				else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
-					player.chips += player.doubleDown ? player.bet * 2 : player.bet
-				}
+			if (player.score === 21 && player.hand.length === 2) {
+				// blackjack is starting with 21 and pays 3:2
+				player.chips += (player.bet * 1.5)
+			}
+			else if (player.score < dealerScore && (dealerScore < 22) || player.score > 21) {
+				player.chips -= player.doubleDown ? player.bet * 2 : player.bet
+			}
+			else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
+				player.chips += player.doubleDown ? player.bet * 2 : player.bet
+			} else if (player.splitScore === 21 && player.splitHand.length === 2) {
+				// blackjack is starting with 21 and pays 3:2
+				player.chips += (player.bet * 1.5)
+			}
+			else if (player.splitScore < dealerScore && (dealerScore < 22) || player.splitScore > 21) {
+				player.chips -= player.doubleDown ? player.bet * 2 : player.bet
+			}
+			else if (player.splitScore > dealerScore && player.splitScore < 22 || player.splitScore < 21 && dealerScore > 21) {
+				player.chips += player.doubleDown ? player.bet * 2 : player.bet
 			}
 		}
+		delete player.splitHand
 		player.hand = []
 		player.doubleDown = false
 	})
