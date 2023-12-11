@@ -25,6 +25,17 @@ const generateID = () => Math.random().toString(36).substring(2, 10);
 let chatRooms = [];
 let tables = [];
 
+const splitCheck = (hand) => {
+	const card1 = hand[0].card
+	const card2 = hand[1].card
+
+	const faceCardCheck = ['j', 'q', 'k']
+
+	return (card1[0] === card2[0] && faceCardCheck.includes(card1[0]))
+		|| (card1[1] === card2[1] && !faceCardCheck.includes(card1[0]))
+		|| card1.length === 3 || card1.length === 4
+}
+
 socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
 
@@ -37,7 +48,6 @@ socketIO.on("connection", (socket) => {
 	socket.on("findRoom", (id) => {
 		let room = finder(chatRooms, id)
 
-
 		socket.emit("foundRoom", room[0].messages);
 	});
 
@@ -47,7 +57,10 @@ socketIO.on("connection", (socket) => {
 		const startingDeck = shuffle(cloneDeck);
 
 		socket.join(name);
-		tables.unshift({ id: generateID(), name, shoe: startingDeck, players: [], count: 0, countedCards: [] });
+		tables.unshift({
+			id: generateID(), name, shoe: startingDeck,
+			players: [], count: 0, countedCards: []
+		});
 		socket.emit("tableList", tables);
 	});
 
@@ -67,7 +80,13 @@ socketIO.on("connection", (socket) => {
 		}
 
 		const activePlayer = !thisTable[0].players.find(player => player?.activePlayer)
-		thisTable[0].players.unshift({ playerName: user, hand: [], score: 0, activePlayer: activePlayer, chips: 10000, bet: 50, doubleDown: false })
+		thisTable[0].players.unshift({
+			playerName: user, hand: [], score: 0,
+			activePlayer: activePlayer,
+			chips: 10000, bet: 50,
+			doubleDown: false,
+			canSplit: false,
+		})
 
 		thisTable[0] = startingHands(thisTable[0]) // only runs for users without a hand
 
@@ -83,6 +102,8 @@ socketIO.on("connection", (socket) => {
 
 		const playerScore = score(thisPlayer[0].hand)
 		const count = getCount(thisTable[0].countedCards)
+
+		thisPlayer[0].canSplit = splitCheck(thisPlayer[0].hand)
 
 		thisPlayer[0].score = playerScore
 		thisTable[0].count = count
@@ -115,8 +136,6 @@ socketIO.on("connection", (socket) => {
 		player[0].doubleDown = doubleDown || false
 
 		const card = table[0].shoe.splice(0, 1)
-
-
 
 		player[0].hand = player[0].hand.concat(card)
 		table[0].countedCards = table[0].countedCards.concat(card)
