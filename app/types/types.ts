@@ -3,6 +3,13 @@ export type Card = {
   cardLink: string;
 };
 
+export type SplitHand = {
+  hand: Card[];
+  score: number;
+  stay: boolean;
+  doubleDown: boolean;
+};
+
 export type Player = {
   playerName: string;
   activePlayer: boolean;
@@ -13,6 +20,7 @@ export type Player = {
   hand: Card[];
   splitHand?: Card[];
   splitScore?: number;
+  splitHands: SplitHand[];
 };
 
 export type TableType = {
