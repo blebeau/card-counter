@@ -6,6 +6,7 @@ export type Card = {
 export type Player = {
   playerName: string;
   activePlayer: boolean;
+  canSplit?: boolean;
   score: number;
   chips: number;
   bet: number;

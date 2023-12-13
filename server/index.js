@@ -33,7 +33,7 @@ const splitCheck = (hand) => {
 
 	return (card1[0] === card2[0] && faceCardCheck.includes(card1[0]))
 		|| (card1[1] === card2[1] && !faceCardCheck.includes(card1[0]))
-		|| card1.length === 3 || card1.length === 4
+		|| card1.length > 2
 }
 
 socketIO.on("connection", (socket) => {
@@ -137,14 +137,25 @@ socketIO.on("connection", (socket) => {
 
 		const card = table[0].shoe.splice(0, 1)
 
-		player[0].hand = player[0].hand.concat(card)
-		table[0].countedCards = table[0].countedCards.concat(card)
+		if (player[0].canSplit) {
+			player[0].splitHand = player[0].splitHand.concat(card)
+			table[0].countedCards = table[0].countedCards.concat(card)
 
-		const playerScore = score(player[0].hand)
-		const count = getCount(table[0].countedCards)
+			const playerScore = score(player[0].splitHand)
+			const count = getCount(table[0].countedCards)
 
-		player[0].score = playerScore;
-		table[0].count = count;
+			player[0].splitScore = playerScore;
+			table[0].count = count;
+		} else {
+			player[0].hand = player[0].hand.concat(card)
+			table[0].countedCards = table[0].countedCards.concat(card)
+
+			const playerScore = score(player[0].hand)
+			const count = getCount(table[0].countedCards)
+
+			player[0].score = playerScore;
+			table[0].count = count;
+		}
 
 		socket.emit("tableList", tables);
 		socket.emit("foundTable", table[0]);
@@ -174,26 +185,33 @@ socketIO.on("connection", (socket) => {
 	});
 
 	socket.on("stay", (data) => {
-		const { room_id } = data;
+		const { room_id, user, doubleDown } = data;
 		let table = finder(tables, room_id)
-		table[0].players = updateActivePlayer(table[0].players)
+		let player = table[0].players.filter((p) => p.playerName == user)
 
-		const activePlayer = table[0].players.find(player => player.activePlayer)
+		if (player[0].canSplit) {
+			player[0].canSplit = false
+		} else {
+			player[0].doubleDown = doubleDown
+			table[0].players = updateActivePlayer(table[0].players)
 
-		if (activePlayer.playerName === "dealer") {
-			const dealer = table[0].players.filter(player => player.playerName === "dealer")
+			const activePlayer = table[0].players.find(player => player.activePlayer)
 
-			table[0].countedCards = table[0].countedCards.concat(dealer[0].hand[1])
+			if (activePlayer.playerName === "dealer") {
+				const dealer = table[0].players.filter(player => player.playerName === "dealer")
 
-			const playerScore = score(dealer[0].hand)
-			const count = getCount(table[0].countedCards)
+				table[0].countedCards = table[0].countedCards.concat(dealer[0].hand[1])
 
-			dealer[0].score = playerScore;
-			table[0].count = count;
+				const playerScore = score(dealer[0].hand)
+				const count = getCount(table[0].countedCards)
 
-			socket.emit("tableList", tables);
-			socket.emit("foundTable", table[0]);
-			socket.emit("dealerPlay", dealer);
+				dealer[0].score = playerScore;
+				table[0].count = count;
+
+				socket.emit("tableList", tables);
+				socket.emit("foundTable", table[0]);
+				socket.emit("dealerPlay", dealer);
+			}
 		}
 
 		socket.emit("tableList", tables);

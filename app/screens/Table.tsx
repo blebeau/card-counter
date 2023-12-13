@@ -95,8 +95,6 @@ const Table = ({ route, navigation }: any) => {
     });
   };
 
-  const insureRound = () => {};
-
   const splitHand = () => {
     socket.emit("split", {
       tableId: id,
@@ -264,7 +262,7 @@ const Table = ({ route, navigation }: any) => {
             <Text>Insurance</Text>
           </Pressable>
           <Pressable
-            disabled={split}
+            disabled={activePlayer[0].canSplit}
             style={
               split
                 ? inlineStyles.gameButtons
