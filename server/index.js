@@ -186,12 +186,12 @@ socketIO.on("connection", (socket) => {
 		let table = finder(tables, room_id)
 		let player = table[0].players.filter((p) => p.playerName == user)
 
+		const splitHand = player[0].splitHands.find(hand => !hand.stay)[0]
 
-		if (player[0].canSplit) {
-			const activeHand = player[0].find(hand => !hand.stay)[0]
 
-			activeHand.stay = true
-			activeHand.doubleDown = doubleDown
+		if (splitHand) {
+			splitHand.stay = true
+			splitHand.doubleDown = doubleDown || false
 
 			socket.emit("tableList", tables);
 			socket.emit("foundTable", table[0]);
