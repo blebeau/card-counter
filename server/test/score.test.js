@@ -13,7 +13,8 @@ const testingTable = [
 				],
 				chips: 100,
 				bet: 50,
-				score: 18
+				score: 18,
+				splitHands: [],
 			},
 			{
 				playerName: "player2",
@@ -23,7 +24,8 @@ const testingTable = [
 				],
 				chips: 100,
 				bet: 50,
-				score: 20
+				score: 20,
+				splitHands: [],
 			},
 			{
 				playerName: "player3",
@@ -33,7 +35,8 @@ const testingTable = [
 				],
 				chips: 100,
 				bet: 50,
-				score: 21
+				score: 21,
+				splitHands: [],
 			},
 			{
 				playerName: "player4",
@@ -43,7 +46,8 @@ const testingTable = [
 				],
 				chips: 100,
 				bet: 50,
-				score: 19
+				score: 19,
+				splitHands: [],
 			},
 			{
 				playerName: "dealer",

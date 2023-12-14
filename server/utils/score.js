@@ -95,15 +95,6 @@ exports.payout = (table) => {
 				}
 				else if (player.score > dealerScore && player.score < 22 || player.score < 21 && dealerScore > 21) {
 					player.chips += player.doubleDown ? player.bet * 2 : player.bet
-				} else if (player.splitScore === 21 && player.splitHand.length === 2) {
-					// blackjack is starting with 21 and pays 3:2
-					player.chips += (player.bet * 1.5)
-				}
-				else if (player.splitScore < dealerScore && (dealerScore < 22) || player.splitScore > 21) {
-					player.chips -= player.doubleDown ? player.bet * 2 : player.bet
-				}
-				else {
-					player.chips += player.doubleDown ? player.bet * 2 : player.bet
 				}
 			}
 
@@ -118,7 +109,6 @@ exports.payout = (table) => {
 exports.splitPayout = (hands, dealerScore) => {
 	hands.forEach(hand => {
 		const score = this.score(hand);
-		console.log('split score', score)
 		if (score === 21 && player.hand.length === 2) {
 			// blackjack is starting with 21 and pays 3:2
 			player.chips += (player.bet * 1.5)

@@ -1,6 +1,6 @@
 const startingHands = require('../utils/startingHand')
 const deck = require("../utils/deck");
-const finder = require("../utils/helpers")
+const { finder, splitCheck } = require("../utils/helpers")
 
 const testingTable = [{
 	id: 1,
@@ -35,3 +35,37 @@ test('Check finder returns correct item', async () => {
 	const table = finder(testingTable, 1)
 	expect(table[0].id).toBe(1)
 });
+
+test('Check if a user can split', () => {
+	const hand = [
+		{
+			card: "acec",
+			cardLink: "../utils/PNG-cards/acec.png"
+		},
+		{
+			card: "aced",
+			cardLink: "../utils/PNG-cards/aced.png"
+		}
+	]
+
+	const split = splitCheck(hand)
+
+	expect(split).toBe(true)
+})
+
+test('Check a user without matching cards cannot split', () => {
+	const hand = [
+		{
+			card: "acec",
+			cardLink: "../utils/PNG-cards/acec.png"
+		},
+		{
+			card: "d3",
+			cardLink: "../utils/PNG-cards/d3.png"
+		}
+	]
+
+	const split = splitCheck(hand)
+
+	expect(split).toBe(false)
+})

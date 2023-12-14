@@ -12,7 +12,7 @@ const shuffle = require("./utils/shuffle");
 const deck = require("./utils/deck");
 
 const startingHands = require("./utils/startingHand");
-const finder = require("./utils/helpers");
+const { finder, splitCheck } = require("./utils/helpers");
 
 const { getCount, score, payout } = require('./utils/score');
 const updateActivePlayer = require('./utils/updateActivePlayer');
@@ -24,17 +24,6 @@ app.use(cors());
 const generateID = () => Math.random().toString(36).substring(2, 10);
 let chatRooms = [];
 let tables = [];
-
-const splitCheck = (hand) => {
-	const card1 = hand[0].card
-	const card2 = hand[1].card
-
-	const faceCardCheck = ['j', 'q', 'k']
-
-	return (card1[0] === card2[0] && faceCardCheck.includes(card1[0]))
-		|| (card1[1] === card2[1] && !faceCardCheck.includes(card1[0]))
-		|| card1.length > 2
-}
 
 socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
