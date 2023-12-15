@@ -227,6 +227,7 @@ socketIO.on("connection", (socket) => {
 				player.score = 0;
 			} else {
 				player.score = score(player.hand)
+				player.canSplit = splitCheck(player.hand)
 			}
 
 		});
@@ -252,9 +253,9 @@ socketIO.on("connection", (socket) => {
 
 		let table = finder(tables, id)
 
-		const dealer = table[0].players.find(player => player.playerName === "dealer")
+		const dealer = table[0].players.filter(player => player.playerName === "dealer")
 		const player = table[0].players.find(player => player.playerName === user)
-		const dealerScore = score(dealer.hand)
+		const dealerScore = score(dealer[0].hand)
 		if (dealerScore === 21) {
 			player.chips = player.chips - player.bet + (2 * insuranceAmount)
 			socket.emit("dealerPlay", dealer);

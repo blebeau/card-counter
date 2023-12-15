@@ -245,20 +245,29 @@ const Table = ({ route, navigation }: any) => {
         </View>
       ) : (
         <View style={[styles.playerOptionsConatainer]}>
-          <Pressable style={inlineStyles.gameButtons} onPress={hit}>
+          <Pressable
+            style={[inlineStyles.gameButtons, { backgroundColor: "#228B22" }]}
+            onPress={hit}
+          >
             <Text>Hit</Text>
           </Pressable>
-          <Pressable style={inlineStyles.gameButtons} onPress={() => stay()}>
+          <Pressable
+            style={[inlineStyles.gameButtons, { backgroundColor: "#6495ED" }]}
+            onPress={() => stay()}
+          >
             <Text>Stay</Text>
           </Pressable>
-          <Pressable style={inlineStyles.gameButtons} onPress={doubleDown}>
+          <Pressable
+            style={[inlineStyles.gameButtons, { backgroundColor: "#EEE8AA" }]}
+            onPress={doubleDown}
+          >
             <Text>Double Down</Text>
           </Pressable>
           <Pressable
             disabled={insurance}
             style={
               insurance
-                ? inlineStyles.gameButtons
+                ? [inlineStyles.gameButtons, { backgroundColor: "#FF6347" }]
                 : inlineStyles.disabledGameButtons
             }
             onPress={doubleDown}
@@ -266,10 +275,10 @@ const Table = ({ route, navigation }: any) => {
             <Text>Insurance</Text>
           </Pressable>
           <Pressable
-            disabled={activePlayer[0].canSplit}
+            disabled={activePlayer[0]?.canSplit}
             style={
               split
-                ? inlineStyles.gameButtons
+                ? [inlineStyles.gameButtons, { backgroundColor: "#DDA0DD" }]
                 : inlineStyles.disabledGameButtons
             }
             onPress={splitHand}

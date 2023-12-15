@@ -36,7 +36,7 @@ const InsuranceModal = ({
   };
 
   const confirmInsurance = (user: string, amount: number, id: string) => {
-    socket.emit("insurance", user, amount || 0, id);
+    socket.emit("insurance", user, amount, id);
 
     closeModal();
   };
@@ -96,10 +96,10 @@ const InsuranceModal = ({
           }
         />
         <Pressable
-          style={styles.modalbutton}
+          style={[styles.modalbutton, { backgroundColor: "#6495ED" }]}
           onPress={() => confirmInsurance(user, insuranceAmount, id)}
         >
-          <Text style={styles.modaltext}>Confirm Insurance</Text>
+          <Text style={styles.modaltext}>Confirm Insurance Amount</Text>
         </Pressable>
       </View>
     </View>
