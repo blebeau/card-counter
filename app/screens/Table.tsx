@@ -275,9 +275,9 @@ const Table = ({ route, navigation }: any) => {
             <Text>Insurance</Text>
           </Pressable>
           <Pressable
-            disabled={activePlayer[0]?.canSplit}
+            disabled={!activePlayer[0]?.canSplit}
             style={
-              split
+              activePlayer[0]?.canSplit
                 ? [inlineStyles.gameButtons, { backgroundColor: "#DDA0DD" }]
                 : inlineStyles.disabledGameButtons
             }

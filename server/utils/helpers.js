@@ -12,7 +12,7 @@ exports.splitCheck = (hand) => {
 		return true
 	}
 
-	if (card1[1] === card2[1] && !faceCardCheck.includes(card1[0])) {
+	if (card1[1] === card2[1] && !faceCardCheck.includes(card1[0]) && !faceCardCheck.includes(card2[0])) {
 		return true
 	}
 

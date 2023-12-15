@@ -8,6 +8,7 @@ export type SplitHand = {
   score: number;
   stay: boolean;
   doubleDown: boolean;
+  canSplit: boolean;
 };
 
 export type Player = {
@@ -18,7 +19,6 @@ export type Player = {
   chips: number;
   bet: number;
   hand: Card[];
-  splitHand?: Card[];
   splitScore?: number;
   splitHands: SplitHand[];
 };
