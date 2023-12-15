@@ -174,9 +174,7 @@ socketIO.on("connection", (socket) => {
 		const { room_id, user, doubleDown } = data;
 		let table = finder(tables, room_id)
 		let player = table[0].players.filter((p) => p.playerName == user)
-
-		const splitHand = player[0].splitHands.find(hand => !hand.stay)[0]
-
+		const splitHand = player[0].splitHands.find(hand => !hand.stay)
 
 		if (splitHand) {
 			splitHand.stay = true

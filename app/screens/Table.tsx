@@ -183,53 +183,53 @@ const Table = ({ route, navigation }: any) => {
                     <Text>Chips: {player.chips}</Text>
                   )}
                   <View style={inlineStyles.player}>
-                    {player.splitHands.length > 0 &&
-                      player.splitHands.map((hand: SplitHand) =>
-                        hand.hand.map((card: Card) => {
+                    {player.playerName !== "dealer" &&
+                    player.splitHands.length > 0
+                      ? player.splitHands.map((hand: SplitHand) =>
+                          hand.hand.map((card: Card) => {
+                            const cardFinder = deckArray.find(
+                              (x) => x.card === card.card
+                            );
+                            return (
+                              <View>
+                                <View key={card.card}>
+                                  <Image
+                                    source={cardFinder?.cardLink}
+                                    style={inlineStyles.image}
+                                  />
+                                </View>
+                              </View>
+                            );
+                          })
+                        )
+                      : player.hand.map((card: Card, index: number) => {
                           const cardFinder = deckArray.find(
                             (x) => x.card === card.card
                           );
-                          return (
-                            <View>
-                              <View key={card.card}>
+                          if (
+                            index === 0 &&
+                            activePlayer.length > 0 &&
+                            player.playerName === "dealer" &&
+                            activePlayer[0].playerName !== "dealer"
+                          ) {
+                            return (
+                              <View key="back-of-card">
                                 <Image
-                                  source={cardFinder?.cardLink}
+                                  source={require("../utils/PNG-cards/backOfCard.png")}
                                   style={inlineStyles.image}
                                 />
                               </View>
-                            </View>
-                          );
-                        })
-                      )}
-                    {player.splitHands.length == 0 &&
-                      player.hand.map((card: Card, index: number) => {
-                        const cardFinder = deckArray.find(
-                          (x) => x.card === card.card
-                        );
-                        if (
-                          index === 0 &&
-                          activePlayer.length > 0 &&
-                          player.playerName === "dealer" &&
-                          activePlayer[0].playerName !== "dealer"
-                        ) {
+                            );
+                          }
                           return (
-                            <View key="back-of-card">
+                            <View key={card.card}>
                               <Image
-                                source={require("../utils/PNG-cards/backOfCard.png")}
+                                source={cardFinder?.cardLink}
                                 style={inlineStyles.image}
                               />
                             </View>
                           );
-                        }
-                        return (
-                          <View key={card.card}>
-                            <Image
-                              source={cardFinder?.cardLink}
-                              style={inlineStyles.image}
-                            />
-                          </View>
-                        );
-                      })}
+                        })}
                   </View>
                 </View>
               );
