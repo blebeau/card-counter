@@ -185,13 +185,13 @@ const Table = ({ route, navigation }: any) => {
                   <View style={inlineStyles.player}>
                     {player.playerName !== "dealer" &&
                     player.splitHands.length > 0
-                      ? player.splitHands.map((hand: SplitHand) =>
-                          hand.hand.map((card: Card) => {
+                      ? player.splitHands.map((hand: SplitHand) => {
+                          return hand.hand.map((card: Card, index: number) => {
                             const cardFinder = deckArray.find(
                               (x) => x.card === card.card
                             );
                             return (
-                              <View>
+                              <View key={`${player.playerName} - ${index}`}>
                                 <View key={card.card}>
                                   <Image
                                     source={cardFinder?.cardLink}
@@ -200,8 +200,8 @@ const Table = ({ route, navigation }: any) => {
                                 </View>
                               </View>
                             );
-                          })
-                        )
+                          });
+                        })
                       : player.hand.map((card: Card, index: number) => {
                           const cardFinder = deckArray.find(
                             (x) => x.card === card.card

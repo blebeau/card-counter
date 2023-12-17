@@ -129,8 +129,7 @@ socketIO.on("connection", (socket) => {
 
 		if (player[0].splitHands.length > 0) {
 			const hand = player[0].splitHands.find(hand => !hand.stay)
-
-			hand = player[0].splitHand.concat(card)
+			hand = player[0].splitHands.concat(card)
 			table[0].countedCards = table[0].countedCards.concat(card)
 
 			hand.score = score(hand.hand);
@@ -175,7 +174,6 @@ socketIO.on("connection", (socket) => {
 		let table = finder(tables, room_id)
 		let player = table[0].players.filter((p) => p.playerName == user)
 		const splitHand = player[0].splitHands.find(hand => !hand.stay)
-
 		if (splitHand) {
 			splitHand.stay = true
 			splitHand.doubleDown = doubleDown || false
@@ -258,6 +256,8 @@ socketIO.on("connection", (socket) => {
 		const dealerScore = score(dealer[0].hand)
 		if (dealerScore === 21) {
 			player.chips = player.chips - player.bet + (2 * insuranceAmount)
+			player.activePlayer = false
+			dealer.activePlayer = true
 			socket.emit("dealerPlay", dealer);
 		}
 		else {
@@ -302,7 +302,7 @@ socketIO.on("connection", (socket) => {
 
 		const handToSplit = player.hand.length === 2 ? player.hand : player.splitHands.filter(hand => !hand.stay)[0]
 
-		player.splitHand = handToSplit.map(card => {
+		player.splitHands = handToSplit.map(card => {
 			const newCard = table.shoe.splice(0, 1)
 			const newHand = [card, newCard[0]]
 			table.countedCards = table.countedCards.concat(newCard)
@@ -320,9 +320,6 @@ socketIO.on("connection", (socket) => {
 		player.canSplit = false
 
 		table.count = getCount(table.countedCards)
-
-		socket.emit("tableList", tables);
-		socket.emit("foundTable", table[0]);
 	});
 });
 
