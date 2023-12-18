@@ -45,7 +45,6 @@ exports.score = (cards) => {
 	// 2 - 6 => count increases by 1 for each
 	// 7 - 9 => count does not change
 	// 10 value cards and aces => count decreases by 1 for each
-
 	cards.forEach((card) => {
 		const cardScore = cardValue(card.card)
 
@@ -108,7 +107,7 @@ exports.payout = (table) => {
 
 exports.splitPayout = (hands, dealerScore) => {
 	hands.forEach(hand => {
-		const score = this.score(hand);
+		const score = this.score(hand.hand);
 		if (score === 21 && player.hand.length === 2) {
 			// blackjack is starting with 21 and pays 3:2
 			player.chips += (player.bet * 1.5)

@@ -192,6 +192,7 @@ const Table = ({ route, navigation }: any) => {
                             );
                             return (
                               <View key={`${player.playerName} - ${index}`}>
+                                <Text>Score: {hand.score}</Text>
                                 <View key={card.card}>
                                   <Image
                                     source={cardFinder?.cardLink}
@@ -246,36 +247,28 @@ const Table = ({ route, navigation }: any) => {
       ) : (
         <View style={[styles.playerOptionsConatainer]}>
           <Pressable
+            disabled={insurance}
             style={[inlineStyles.gameButtons, { backgroundColor: "#228B22" }]}
             onPress={hit}
           >
             <Text>Hit</Text>
           </Pressable>
           <Pressable
+            disabled={insurance}
             style={[inlineStyles.gameButtons, { backgroundColor: "#6495ED" }]}
             onPress={() => stay()}
           >
             <Text>Stay</Text>
           </Pressable>
           <Pressable
+            disabled={insurance}
             style={[inlineStyles.gameButtons, { backgroundColor: "#EEE8AA" }]}
             onPress={doubleDown}
           >
             <Text>Double Down</Text>
           </Pressable>
           <Pressable
-            disabled={insurance}
-            style={
-              insurance
-                ? [inlineStyles.gameButtons, { backgroundColor: "#FF6347" }]
-                : inlineStyles.disabledGameButtons
-            }
-            onPress={doubleDown}
-          >
-            <Text>Insurance</Text>
-          </Pressable>
-          <Pressable
-            disabled={!activePlayer[0]?.canSplit}
+            disabled={!activePlayer[0]?.canSplit || insurance}
             style={
               activePlayer[0]?.canSplit
                 ? [inlineStyles.gameButtons, { backgroundColor: "#DDA0DD" }]
