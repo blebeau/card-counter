@@ -83,7 +83,7 @@ exports.payout = (table) => {
 	table[0].players.forEach(player => {
 		if (player.playerName !== 'dealer') {
 			if (player.splitHands.length > 0) {
-				this.splitPayout(player.splitHands, dealerScore)
+				this.splitPayout(player, dealerScore)
 			} else {
 				if (player.score === 21 && player.hand.length === 2) {
 					// blackjack is starting with 21 and pays 3:2
@@ -105,8 +105,8 @@ exports.payout = (table) => {
 	return table[0]
 }
 
-exports.splitPayout = (hands, dealerScore) => {
-	hands.forEach(hand => {
+exports.splitPayout = (player, dealerScore) => {
+	player.splitHands.forEach(hand => {
 		const score = this.score(hand.hand);
 		if (score === 21 && player.hand.length === 2) {
 			// blackjack is starting with 21 and pays 3:2
