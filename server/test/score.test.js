@@ -1,4 +1,4 @@
-const { getCount, score, payout } = require('../utils/score');
+const { getCount, score, payout, splitPayout } = require('../utils/score');
 
 const testingTable = [
 	{
@@ -56,6 +56,36 @@ const testingTable = [
 					{ card: 'h9', cardLink: '../utils/PNG-cards/h9.png' }
 				],
 				score: 19
+			},
+			{
+				playerName: "splitplayer",
+				hand: [],
+				chips: 200,
+				bet: 50,
+				splitHands: [
+					{
+						hand: [
+							{ card: 'd7', cardLink: '../utils/PNG-cards/d7.png' },
+							{ card: 'd4', cardLink: '../utils/PNG-cards/d4.png' },
+							{ card: 's8', cardLink: '../utils/PNG-cards/s8.png' }
+						],
+						score: 19,
+						stay: false,
+						doubleDown: false,
+						canSplit: false
+					},
+					{
+						hand: [
+							{ card: 'c7', cardLink: '../utils/PNG-cards/c7.png' },
+							{ card: 'd5', cardLink: '../utils/PNG-cards/d5.png' },
+							{ card: 's5', cardLink: '../utils/PNG-cards/s5.png' }
+						],
+						score: 17,
+						stay: false,
+						doubleDown: false,
+						canSplit: false
+					}
+				],
 			}
 		],
 		// shoe: deck,
@@ -73,6 +103,72 @@ const testingTable = [
 			{ card: 'h9', cardLink: '../utils/PNG-cards/h9.png' }
 		]
 	}
+]
+
+const SplitUserTable = [{
+	players: [
+		{
+			playerName: "splitplayer",
+			hand: [],
+			chips: 200,
+			bet: 50,
+			splitHands: [
+				{
+					hand: [
+						{ card: 'd7', cardLink: '../utils/PNG-cards/d7.png' },
+						{ card: 'd4', cardLink: '../utils/PNG-cards/d4.png' },
+						{ card: 's8', cardLink: '../utils/PNG-cards/s8.png' }
+					],
+					score: 19,
+					stay: false,
+					doubleDown: false,
+					canSplit: false
+				},
+				{
+					hand: [
+						{ card: 'c7', cardLink: '../utils/PNG-cards/c7.png' },
+						{ card: 'd5', cardLink: '../utils/PNG-cards/d5.png' },
+						{ card: 's5', cardLink: '../utils/PNG-cards/s5.png' }
+					],
+					score: 17,
+					stay: false,
+					doubleDown: false,
+					canSplit: false
+				}
+			],
+		},
+		{
+			playerName: "player2",
+			hand: [
+				{ card: 'jc', cardLink: '../utils/PNG-cards/jc.png' },
+				{ card: 'd10', cardLink: '../utils/PNG-cards/d10.png' }
+			],
+			chips: 100,
+			bet: 50,
+			score: 20,
+			splitHands: [],
+			doubleDown: true,
+		},
+		{
+			playerName: "dealer",
+			hand: [
+				{ card: 'kc', cardLink: '../utils/PNG-cards/kc.png' },
+				{ card: 'h9', cardLink: '../utils/PNG-cards/h9.png' }
+			],
+			score: 19
+		}],
+	countedCards: [
+		{ card: 'c7', cardLink: '../utils/PNG-cards/c7.png' },
+		{ card: 'd5', cardLink: '../utils/PNG-cards/d5.png' },
+		{ card: 's5', cardLink: '../utils/PNG-cards/s5.png' },
+		{ card: 'd7', cardLink: '../utils/PNG-cards/d7.png' },
+		{ card: 'd4', cardLink: '../utils/PNG-cards/d4.png' },
+		{ card: 's8', cardLink: '../utils/PNG-cards/s8.png' },
+		{ card: 'kc', cardLink: '../utils/PNG-cards/kc.png' },
+		{ card: 'h9', cardLink: '../utils/PNG-cards/h9.png' }
+	]
+}
+
 ]
 
 test('check scores are correct', async () => {
@@ -94,7 +190,7 @@ test('check scores are correct', async () => {
 	expect(player5).toBe(19)
 });
 
-test('check chips update correctly', async () => {
+test('check chips update for regular payouts correctly', async () => {
 	const player1 = testingTable[0].players[0]
 	const player2 = testingTable[0].players[1]
 	const player3 = testingTable[0].players[2]
@@ -110,4 +206,17 @@ test('check chips update correctly', async () => {
 	expect(player2.chips).toBe(150)
 	expect(player3.chips).toBe(175)
 	expect(player4.chips).toBe(100)
+});
+
+test('check chips update for split and doubledown player correctly', async () => {
+	const splitPlayer = SplitUserTable[0].players[0]
+	const doubleDownPlayer = SplitUserTable[0].players[1]
+
+	expect(splitPlayer.chips).toBe(200)
+	expect(doubleDownPlayer.chips).toBe(100)
+
+	payout(SplitUserTable)
+
+	expect(splitPlayer.chips).toBe(150)
+	expect(doubleDownPlayer.chips).toBe(200)
 });
