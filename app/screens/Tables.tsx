@@ -7,7 +7,6 @@ import { styles } from "../utils/styles";
 import TableComponent from "../components/TableComponent";
 import { TableType } from "../types/types";
 
-// screen with chats
 const Tables = () => {
   const [visible, setVisible] = useState(false);
   const [tables, setTables] = useState<TableType[]>([]);

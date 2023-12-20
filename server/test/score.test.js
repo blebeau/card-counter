@@ -88,7 +88,6 @@ const testingTable = [
 				],
 			}
 		],
-		// shoe: deck,
 		countedCards: [
 			{ card: 'd3', cardLink: '../utils/PNG-cards/d3.png' },
 			{ card: 'd6', cardLink: '../utils/PNG-cards/d6.png' },

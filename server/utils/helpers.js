@@ -21,8 +21,4 @@ exports.splitCheck = (hand) => {
 	}
 
 	return false
-
-	// return (card1[0] === card2[0] && faceCardCheck.includes(card1[0]))
-	// 	|| (card1[1] === card2[1] && !faceCardCheck.includes(card1[0]))
-	// 	|| card1.length > 2
 }

@@ -1,9 +1,6 @@
 import { View, Text, TextInput, Pressable } from "react-native";
 import React, { useState } from "react";
-// import socket from "../utils/socket";
 import { styles } from "../utils/styles";
-// import socket from "../utils/socket";
-import { Player, TableType } from "../types/types";
 
 type InsuranceModal = {
   setVisible: any;

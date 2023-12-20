@@ -22,14 +22,12 @@ export const styles = StyleSheet.create({
 		borderWidth: 1,
 		width: "90%",
 		padding: 8,
-		// borderRadius: 2,
 	},
 	loginbutton: {
 		backgroundColor: "green",
 		padding: 12,
 		marginVertical: 10,
 		width: "60%",
-		// borderRadius: "50%",
 		elevation: 1,
 	},
 	loginbuttonText: {

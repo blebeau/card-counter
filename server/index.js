@@ -25,18 +25,6 @@ const generateID = () => Math.random().toString(36).substring(2, 10);
 let chatRooms = [];
 let tables = [];
 
-// const hands = () => { // TODO: Update to use Map
-//     const playerMap = new Map();
-
-//     table?.players.forEach((player) => {
-//       playerMap.set(`${player.playerName}`, {
-//         hands: player.hand.length > 0 ? player.hand : player.splitHand,
-//         playerChips: player.chips,
-//         playerBet: player.bet,
-//       });
-//     });
-//   };
-
 socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
 
