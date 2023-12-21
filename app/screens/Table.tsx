@@ -177,11 +177,6 @@ const Table = ({ route, navigation }: any) => {
                   }
                   key={`${player.playerName}-${index}`}
                 >
-                  <Text>{player.score}</Text>
-                  <Text>{player.playerName}</Text>
-                  {player.playerName !== "dealer" && (
-                    <Text>Chips: {player.chips}</Text>
-                  )}
                   <View style={inlineStyles.player}>
                     {player.playerName !== "dealer" &&
                     player.splitHands.length > 0
@@ -231,6 +226,13 @@ const Table = ({ route, navigation }: any) => {
                             </View>
                           );
                         })}
+                    <View>
+                      <Text>Score: {player.score}</Text>
+                      <Text>{player.playerName}</Text>
+                      {player.playerName !== "dealer" && (
+                        <Text>Chips: {player.chips}</Text>
+                      )}
+                    </View>
                   </View>
                 </View>
               );

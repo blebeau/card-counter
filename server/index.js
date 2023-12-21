@@ -62,14 +62,15 @@ socketIO.on("connection", (socket) => {
 	socket.on("startGame", (data) => {
 		const { room_id, user } = data
 
-		let thisTable = finder(tables, room_id)
+		let table = finder(tables, room_id)
 
-		if (thisTable[0].players.length === 0) { // not when joining
-			thisTable[0].players.unshift({ playerName: "dealer", hand: [], activePlayer: false })
+		if (table[0].players.length === 0) { // not when joining
+			table[0].players.push({ playerName: "dealer", hand: [], activePlayer: false })
 		}
 
-		const activePlayer = !thisTable[0].players.find(player => player?.activePlayer)
-		thisTable[0].players.unshift({
+		const activePlayer = !table[0].players.find(player => player?.activePlayer)
+
+		table[0].players.splice(table[0].players - 1, 0, {
 			playerName: user, hand: [], score: 0,
 			activePlayer: activePlayer,
 			chips: 10000, bet: 50,
@@ -78,9 +79,14 @@ socketIO.on("connection", (socket) => {
 			splitHands: []
 		})
 
-		thisTable[0] = startingHands(thisTable[0]) // only runs for users without a hand
+		if (table[0].players > 2) {
+			// wait for new round
+			socket.emit("foundTable", table[0]);
+		} else
 
-		const offerInsurance = thisTable[0].players.find(player => player.playerName === "dealer" &&
+			table[0] = startingHands(table[0]) // only runs for users without a hand
+
+		const offerInsurance = table[0].players.find(player => player.playerName === "dealer" &&
 			player.hand[1].card.includes("a")
 		)
 
@@ -88,17 +94,17 @@ socketIO.on("connection", (socket) => {
 			socket.emit("offerInsurance")
 		}
 
-		const thisPlayer = thisTable[0].players.filter(player => player.playerName === user)
+		const thisPlayer = table[0].players.filter(player => player.playerName === user)
 
 		const playerScore = score(thisPlayer[0].hand)
-		const count = getCount(thisTable[0].countedCards)
+		const count = getCount(table[0].countedCards)
 
 		thisPlayer[0].canSplit = splitCheck(thisPlayer[0].hand)
 
 		thisPlayer[0].score = playerScore
-		thisTable[0].count = count
+		table[0].count = count
 
-		socket.emit("gameStarted", thisTable[0]);
+		socket.emit("gameStarted", table[0]);
 	});
 
 	socket.on("newMessage", (data) => {
@@ -121,7 +127,7 @@ socketIO.on("connection", (socket) => {
 		const { room_id, user, doubleDown } = data;
 		let table = finder(tables, room_id)
 
-		let player = table[0].players.filter((p) => p.playerName == user)
+		let player = table[0].players.filter(player => player.playerName === user)
 
 		player[0].doubleDown = doubleDown || false
 
