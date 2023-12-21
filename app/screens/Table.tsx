@@ -226,6 +226,16 @@ const Table = ({ route, navigation }: any) => {
                             </View>
                           );
                         })}
+                    {player.hand.length === 0 &&
+                      player.splitHands.length === 0 &&
+                      activePlayer.length === 1 && (
+                        <View>
+                          <Text>
+                            Round in progress. You will be dealt in on the next
+                            hand!
+                          </Text>
+                        </View>
+                      )}
                     <View>
                       <Text>Score: {player.score}</Text>
                       <Text>{player.playerName}</Text>
