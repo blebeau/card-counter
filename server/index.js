@@ -78,33 +78,33 @@ socketIO.on("connection", (socket) => {
 			canSplit: false,
 			splitHands: []
 		})
-
-		if (table[0].players > 2) {
+		if (table[0].players.length > 2) {
 			// wait for new round
 			socket.emit("foundTable", table[0]);
-		} else
+		} else {
 
 			table[0] = startingHands(table[0]) // only runs for users without a hand
 
-		const offerInsurance = table[0].players.find(player => player.playerName === "dealer" &&
-			player.hand[1].card.includes("a")
-		)
+			const offerInsurance = table[0].players.find(player => player.playerName === "dealer" &&
+				player.hand[1].card.includes("a")
+			)
 
-		if (offerInsurance) {
-			socket.emit("offerInsurance")
+			if (offerInsurance) {
+				socket.emit("offerInsurance")
+			}
+
+			const thisPlayer = table[0].players.filter(player => player.playerName === user)
+
+			const playerScore = score(thisPlayer[0].hand)
+			const count = getCount(table[0].countedCards)
+
+			thisPlayer[0].canSplit = splitCheck(thisPlayer[0].hand)
+
+			thisPlayer[0].score = playerScore
+			table[0].count = count
+
+			socket.emit("gameStarted", table[0]);
 		}
-
-		const thisPlayer = table[0].players.filter(player => player.playerName === user)
-
-		const playerScore = score(thisPlayer[0].hand)
-		const count = getCount(table[0].countedCards)
-
-		thisPlayer[0].canSplit = splitCheck(thisPlayer[0].hand)
-
-		thisPlayer[0].score = playerScore
-		table[0].count = count
-
-		socket.emit("gameStarted", table[0]);
 	});
 
 	socket.on("newMessage", (data) => {
@@ -128,7 +128,6 @@ socketIO.on("connection", (socket) => {
 		let table = finder(tables, room_id)
 
 		let player = table[0].players.filter(player => player.playerName === user)
-
 		player[0].doubleDown = doubleDown || false
 
 		const card = table[0].shoe.splice(0, 1)
@@ -194,7 +193,6 @@ socketIO.on("connection", (socket) => {
 		} else {
 			player[0].doubleDown = doubleDown
 			table[0].players = updateActivePlayer(table[0].players)
-
 		}
 		const activePlayer = table[0].players.find(player => player.activePlayer)
 		if (activePlayer.playerName === "dealer") {
