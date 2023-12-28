@@ -164,17 +164,34 @@ const Table = ({ route, navigation }: any) => {
           </View>
         </View>
 
-        <View style={inlineStyles.table}>
+        <View style={[inlineStyles.table]}>
           {table?.players &&
             table?.players.length > 0 &&
             table?.players.map((player: Player, index: number) => {
+              let count = index * 100;
               return (
                 <View
-                  style={
+                  style={[
                     player.playerName === "dealer"
-                      ? inlineStyles.dealer
-                      : inlineStyles.activePlayer
-                  }
+                      ? [
+                          inlineStyles.dealer,
+                          { position: "absolute", top: 25, left: "5%" },
+                        ]
+                      : [],
+                    inlineStyles.activePlayer,
+                    player.playerName === user
+                      ? [{ position: "absolute", bottom: 0, left: "50%" }]
+                      : [],
+                    player.playerName !== "dealer" && player.playerName !== user
+                      ? [
+                          {
+                            position: "absolute",
+                            bottom: "20%",
+                            right: count,
+                          },
+                        ]
+                      : [],
+                  ]}
                   key={`${player.playerName}-${index}`}
                 >
                   <View style={inlineStyles.player}>
